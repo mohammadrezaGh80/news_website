@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # local
     'accounts',
+    'pages',
 ]
 
 MIDDLEWARE = [
