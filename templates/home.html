@@ -7,10 +7,17 @@
         <div class="container">
             <div class="row">
                 <h2>Home Page</h2>
-                <div class="wrapper-links">
-                    <a href="#">Login</a> /
-                    <a href="#">SignUp</a>
-                </div>
+                {% if user.is_authenticated %}
+                    <p>
+                        <span>{{ user.username }}</span> /
+                        <a href="{% url 'logout' %}">Log Out</a>
+                    </p>
+                {% else %}
+                    <div class="wrapper-links">
+                        <a href="{% url 'login' %}">Login</a> /
+                        <a href="{% url 'signup' %}">SignUp</a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </section>

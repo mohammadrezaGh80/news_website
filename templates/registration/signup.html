@@ -1,0 +1,17 @@
+{% extends "_base.html" %}
+
+{% block page_title %}SignUp{% endblock page_title %}
+
+{% block page_content %}
+    <section class="mt-5">
+        <div class="container">
+            <div class="row">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button class="btn btn-success" type="submit">Signup</button>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock page_content %}
