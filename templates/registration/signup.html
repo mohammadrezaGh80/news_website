@@ -7,10 +7,17 @@
     <section class="mt-5">
         <div class="container">
             <div class="row">
+                <a href="{% url 'home' %}" class="wrapper-icon d-flex align-items-center text-decoration-none">
+                    <span style="font-size: 22px" class="material-symbols-outlined">arrow_back</span>
+                    <span style="font-size: 18px" class="ps-1">Back Home</span>
+                </a>
                 <form action="" method="POST" class="p-3">
                     {% csrf_token %}
                     {{ form|crispy }}
-                    <button class="btn btn-success" type="submit">Signup</button>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-success" type="submit">SignUp</button>
+                        <a href="{% url 'login' %}">Login</a>
+                    </div>
                 </form>
             </div>
         </div>
