@@ -10,7 +10,8 @@
                 {% if user.is_authenticated %}
                     <p>
                         <span>{{ user.username }}</span> /
-                        <a href="{% url 'logout' %}">Log Out</a>
+                        <a href="{% url 'logout' %}">Log Out</a> /
+                        <a href="{% url 'password_change' %}">Change Password</a>
                     </p>
                 {% else %}
                     <div class="wrapper-links">
