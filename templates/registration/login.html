@@ -16,7 +16,10 @@
                     {{ form|crispy }}
                     <div class="d-flex justify-content-between">
                         <button class="btn btn-success" type="submit">Login</button>
-                        <a href="{% url 'signup' %}">SignUp</a>
+                        <div class="wrapper-link">
+                            <a href="{% url 'signup' %}">SignUp</a> /
+                            <a href="{% url 'password_reset' %}">Forgot Password?</a>
+                        </div>
                     </div>
                 </form>
             </div>
