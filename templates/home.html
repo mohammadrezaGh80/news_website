@@ -3,20 +3,20 @@
 {% block page_title %}صفحه اصلی{% endblock page_title %}
 
 {% block page_content %}
-    <section class="mt-5">
+    <section class="mt-5" style="direction: rtl">
         <div class="container">
             <div class="row">
                 <h2>خانه</h2>
                 {% if user.is_authenticated %}
                     <p>
                         <span>{{ user.username }}</span> /
-                        <a href="{% url 'logout' %}">خروج</a> /
-                        <a href="{% url 'password_change' %}">تغییر رمز عبور</a>
+                        <a class="text-decoration-none" href="{% url 'password_change' %}">تغییر رمز عبور</a> /
+                        <a class="text-decoration-none" href="{% url 'logout' %}">خروج</a>
                     </p>
                 {% else %}
                     <div class="wrapper-links">
-                        <a href="{% url 'login' %}">ورود</a> /
-                        <a href="{% url 'signup' %}">ثبت نام</a>
+                        <a class="text-decoration-none" href="{% url 'signup' %}">ثبت نام</a> /
+                        <a class="text-decoration-none" href="{% url 'login' %}">ورود</a>
                     </div>
                 {% endif %}
             </div>

@@ -1,0 +1,20 @@
+{% extends "_base.html" %}
+
+{% block page_title %}لیست خبر ها{% endblock page_title %}
+
+{% block page_content %}
+    <section class="mt-5" style="direction: rtl">
+        <div class="container">
+            <div class="row">
+                {% for report in reports %}
+                    <div class="col-12 mb-4 card shadow p-3 border-0">
+                        <a class="text-decoration-none d-block" href="#">
+                            <h2 class="fs-3">{{ report.title }}</h2>
+                        </a>
+                        <p class="mt-3">{{ report.description|truncatewords:20 }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock page_content %}
