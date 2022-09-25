@@ -8,10 +8,11 @@
             <div class="row">
                 {% for report in reports %}
                     <div class="col-12 mb-4 card shadow p-3 border-0">
-                        <a class="text-decoration-none d-block" href="#">
+                        <a class="text-decoration-none d-block" href="{{ report.get_absolute_url }}">
                             <h2 class="fs-3">{{ report.title }}</h2>
                         </a>
                         <p class="mt-3">{{ report.description|truncatewords:20 }}</p>
+                        <a class="text-decoration-none fw-bold" href="{{ report.get_absolute_url }}">ادامه مطلب...</a>
                     </div>
                 {% endfor %}
             </div>
