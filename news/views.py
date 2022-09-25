@@ -13,3 +13,9 @@ class ReportDetailView(generic.DetailView):
     model = Report
     template_name = "news/report_detail.html"
     context_object_name = "report"
+
+
+class ReportCreateView(generic.CreateView):
+    model = Report
+    fields = ["title", "description", "author"]
+    template_name = "news/report_create_and_update.html"

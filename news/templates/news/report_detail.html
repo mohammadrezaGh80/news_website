@@ -3,14 +3,13 @@
 {% block page_title %}{{ report.title }}{% endblock page_title %}
 
 {% block page_content %}
-    <section class="mt-5">
+    <section class="my-5">
         <div class="container">
             <div class="row">
-                <div class="col-12 mb-4 card shadow p-3 border-0">
+                <div class="col-12 card shadow p-3 border-0">
                     <h2>{{ report.title }}</h2>
                     <p class="mt-3">نویسنده: <span class="fw-bold">{{ report.author }}</span></p>
                     <p>{{ report.description|linebreaks }}</p>
-                    <a class="text-decoration-none fw-bold" href="{% url 'report_list' %}">لیست خبر ها</a>
                 </div>
             </div>
         </div>
