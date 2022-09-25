@@ -1,6 +1,6 @@
 {% extends "_base.html" %}
 
-{% block page_title %}SignUp{% endblock page_title %}
+{% block page_title %}ثبت نام{% endblock page_title %}
 {% load crispy_forms_tags %}
 
 {% block page_content %}
@@ -9,14 +9,14 @@
             <div class="row">
                 <a href="{% url 'home' %}" class="wrapper-icon d-flex align-items-center text-decoration-none">
                     <span style="font-size: 22px" class="material-symbols-outlined">arrow_back</span>
-                    <span style="font-size: 18px" class="ps-1">Back Home</span>
+                    <span style="font-size: 18px" class="ps-1">بازگشت به صفحه اصلی</span>
                 </a>
                 <form action="" method="POST" class="p-3">
                     {% csrf_token %}
                     {{ form|crispy }}
                     <div class="d-flex justify-content-between">
-                        <button class="btn btn-success" type="submit">SignUp</button>
-                        <a class="text-decoration-none" href="{% url 'login' %}">Do you have any account?</a>
+                        <button class="btn btn-success" type="submit">ثبت نام</button>
+                        <a class="text-decoration-none" href="{% url 'login' %}">آیا اکانتی دارید؟</a>
                     </div>
                 </form>
             </div>

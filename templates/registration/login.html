@@ -1,6 +1,6 @@
 {% extends "_base.html" %}
 
-{% block page_title %}Log In{% endblock page_title %}
+{% block page_title %}ورود به سایت{% endblock page_title %}
 {% load crispy_forms_tags %}
 
 {% block page_content %}
@@ -9,16 +9,16 @@
             <div class="row">
                 <a href="{% url 'home' %}" class="wrapper-icon d-flex align-items-center text-decoration-none">
                     <span style="font-size: 22px" class="material-symbols-outlined">arrow_back</span>
-                    <span style="font-size: 18px" class="ps-1">Back Home</span>
+                    <span style="font-size: 18px" class="ps-1">بازگشت به صفحه اصلی</span>
                 </a>
                 <form action="" method="POST" class="p-3">
                     {% csrf_token %}
                     {{ form|crispy }}
                     <div class="d-flex justify-content-between">
-                        <button class="btn btn-success" type="submit">Login</button>
+                        <button class="btn btn-success" type="submit">ورود</button>
                         <div class="wrapper-link">
-                            <a class="text-decoration-none" href="{% url 'signup' %}">Don't have any account?</a> /
-                            <a class="text-decoration-none" href="{% url 'password_reset' %}">Forgot Password?</a>
+                            <a class="text-decoration-none" href="{% url 'signup' %}">آیا اکانتی ندارید؟</a> /
+                            <a class="text-decoration-none" href="{% url 'password_reset' %}">رمز عبور خود را فراموش کرده اید؟</a>
                         </div>
                     </div>
                 </form>

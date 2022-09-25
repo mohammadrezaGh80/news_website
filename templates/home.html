@@ -1,22 +1,22 @@
 {% extends "_base.html" %}
 
-{% block page_title %}Home Page{% endblock page_title %}
+{% block page_title %}صفحه اصلی{% endblock page_title %}
 
 {% block page_content %}
     <section class="mt-5">
         <div class="container">
             <div class="row">
-                <h2>Home Page</h2>
+                <h2>خانه</h2>
                 {% if user.is_authenticated %}
                     <p>
                         <span>{{ user.username }}</span> /
-                        <a href="{% url 'logout' %}">Log Out</a> /
-                        <a href="{% url 'password_change' %}">Change Password</a>
+                        <a href="{% url 'logout' %}">خروج</a> /
+                        <a href="{% url 'password_change' %}">تغییر رمز عبور</a>
                     </p>
                 {% else %}
                     <div class="wrapper-links">
-                        <a href="{% url 'login' %}">Login</a> /
-                        <a href="{% url 'signup' %}">SignUp</a>
+                        <a href="{% url 'login' %}">ورود</a> /
+                        <a href="{% url 'signup' %}">ثبت نام</a>
                     </div>
                 {% endif %}
             </div>
