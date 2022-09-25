@@ -1,0 +1,35 @@
+{% extends "_base.html" %}
+
+{% block page_title %}{% endblock page_title %}
+
+{% block page_content %}
+    <section class="my-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 d-flex align-items-center justify-content-center">
+                    <div class="modal d-block position-static" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">حذف خبر</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <p>آیا از حذف خبر <span class="text-primary">{{ report.title }}</span> اطمینان دارید؟</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="{{ report.get_absolute_url }}" class="btn btn-primary">بازگشت به خبر</a>
+                                    <form action="" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">حذف
+                                    </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock page_content %}

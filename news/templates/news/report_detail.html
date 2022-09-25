@@ -11,7 +11,7 @@
                         <h2>{{ report.title }}</h2>
                         <div class="wrapper-links d-flex align-items-center me-3">
                             <a href="{% url 'report_update' report.id %}" class="btn btn-primary">ویرایش</a>
-                            <a href="#" class="btn btn-danger me-2">حذف</a>
+                            <a href="{% url 'report_delete' report.id %}" class="btn btn-danger me-2">حذف</a>
                         </div>
                     </div>
                     <p class="mt-3">نویسنده: <span class="fw-bold">{{ report.author }}</span></p>
