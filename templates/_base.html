@@ -1,40 +1,118 @@
-<!doctype html>
-<html lang="en">
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.rtl.min.css"
+          integrity="sha384-OXTEbYDqaX2ZY/BOaZV/yFGChYHtrXH2nyXJ372n2Y8abBhrqacCEe+3qhSHtLjy" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+          integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <title>{% block page_title %}{% endblock page_title %}</title>
+    {% block page_style %}{% endblock page_style %}
 </head>
-<body style="background-color: #dadade; direction: rtl">
-<nav class="p-3">
-    <div class="container">
-        <div class="row">
-            <ul class="nav nav-pills">
-                <li class="nav-item">
-                    <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.view_name == 'home' %}active{% endif %}">خانه</a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'report_list' %}" class="nav-link {% if request.resolver_match.view_name == 'report_list' %}active{% endif %}">لیست خبر ها</a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'report_create' %}" class="nav-link {% if request.resolver_match.view_name == 'report_create' %}active{% endif %}">ساخت خبر جدید</a>
-                </li>
-            </ul>
+
+<body>
+
+<header class="position-sticky top-0" style="z-index: 999;">
+    <nav class="navbar navbar-expand-md" style="background-color:#F54437">
+        <div class="container-fluid">
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <i style="font-size: 26px" class="fa-regular fa-bars fw-bold text-light"></i>
+            </button>
+            <span class="order-md-1 order-0 d-flex align-items-center">
+                    <i class="fa-regular fa-user text-light"></i>
+                    <a href="#" class="text-light ms-2">ثبت نام</a>
+                    <span class="mx-1 fs-5 mt-1">/</span>
+                    <a href="#" class="text-light">ورود</a>
+                </span>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="#">خانه</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">اخبار</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">ساخت خبر</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
+</header>
 
 {% block page_content %}
 {% endblock page_content %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+<footer style="background-color: #202125;" class="text-light">
+    <div class="container">
+        <div class="row border-bottom border-secondary py-4">
+            <div class="col-6 col-md mb-4 mb-md-0 d-flex flex-column align-items-center">
+                <ul class="text-center">
+                    <li class="mb-2"><a class="text-light" href="#">تازه ها</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">سلامتی</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">فرهنگ</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">زندگی</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">تکنولوژی</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md mb-4 mb-md-0  d-flex flex-column align-items-center">
+                <ul class="text-center">
+                    <li class="mb-2"><a class="text-light" href="#">سفر</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">کسب و کار</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">اروپا</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">آرایش</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">توریست</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md mb-4 mb-md-0  d-flex flex-column align-items-center">
+                <ul class="text-center">
+                    <li class="mb-2"><a class="text-light" href="#">جهان</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">غذا</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">شمشیر بازی</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">شهر بزرگ</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md mb-4 mb-md-0  d-flex flex-column align-items-center">
+                <ul class="text-center">
+                    <li class="mb-2"><a class="text-light" href="#">ورزش</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">استرالیا</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">تعطیلات</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">خاورمیانه</a></li>
+                </ul>
+            </div>
+            <div class="col-12 col-md mb-4 mb-md-0 d-flex flex-column align-items-center">
+                <ul class="text-center">
+                    <li class="mb-2"><a class="text-light" href="#">فناوری و علوم</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">تجارت</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">اتومبیل رانی</a></li>
+                    <li class="mb-2"><a class="text-light" href="#">سنگ نوردی</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col py-4 text-center">
+                <span style="color: #F54437;">تمامی حقوق محفوظ است</span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+{% block page_script %}
+{% endblock page_script %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
         crossorigin="anonymous"></script>
 </body>
+
 </html>
