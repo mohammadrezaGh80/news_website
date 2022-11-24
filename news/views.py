@@ -40,7 +40,7 @@ def report_create_view(request):
 
 class ReportUpdateView(generic.UpdateView):
     model = Report
-    fields = ["title", "description", "author"]
+    form_class = ReportForm
     template_name = "news/report_create_and_update.html"
 
 

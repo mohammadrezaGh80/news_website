@@ -11,14 +11,14 @@
 
 {% block page_style %}
     <style>
-        .warning-form{
-                background-color: #dea514;
-            }
+        .warning-form {
+            background-color: #dea514;
+        }
 
         .warning-form p,
-        .warning-form a{
-                font-family: "Vazir-Bold", serif;
-                font-size: 18px;
+        .warning-form a {
+            font-family: "Vazir-Bold", serif;
+            font-size: 18px;
         }
     </style>
 {% endblock page_style %}
@@ -27,13 +27,15 @@
     <section class="py-5 flex-grow-1" style="direction: ltr;background-color: #25272B">
         <div class="container">
             <div class="row">
-                <div>
+                <div class="col-12">
                     {% if request.resolver_match.view_name == "report_create" %}
-                        <a style="color: #f3f3f3" href="{% url 'report_list' %}"
-                           class="wrapper-icon d-flex align-items-center text-decoration-none">
-                            <i class="fa-solid fa-arrow-left fa-lg"></i>
-                            <span style="font-size: 18px" class="pe-1">بازگشت به صفحه اصلی</span>
-                        </a>
+                        <p style="direction: rtl" class="d-flex align-items-center">
+                            <a style="color: #f3f3f3;" href="{% url 'home' %}"
+                               class="wrapper-icon text-decoration-none">
+                                <i class="fa-solid fa-arrow-right fa-lg"></i>
+                                <span style="font-size: 18px" class="ps-2">بازگشت به صفحه اصلی</span>
+                            </a>
+                        </p>
                         {% if user.is_authenticated %}
                             <div style="background-color: #eeeeee" class="col-12 card shadow mt-3 border-0 py-3 px-4">
                                 <form action="" method="POST">
@@ -51,28 +53,54 @@
                                 </form>
                             </div>
                         {% else %}
-                            <div style="direction: rtl" class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row mt-4">
-                            <div class="d-flex flex-column flex-lg-row align-items-center">
-                                <i class="fa-solid fa-user text-white mb-3 mb-lg-0 me-lg-3 fa-lg"></i>
-                                <p class="text-white text-center text-lg-start">برای ساخت خبر لازم است وارد شده یا ثبت نام کنید</p>
+                            <div style="direction: rtl"
+                                 class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row mt-4">
+                                <div class="d-flex flex-column flex-lg-row align-items-center">
+                                    <i class="fa-solid fa-user text-white mb-3 mb-lg-0 me-lg-3 fa-lg"></i>
+                                    <p class="text-white text-center text-lg-start">برای ساخت خبر لازم است وارد شده یا
+                                        ثبت نام کنید</p>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center mt-3 mt-lg-0">
+                                    <p class="text-white me-2 me-lg-3">
+                                        <a class="text-white border-bottom" href="{% url 'login' %}">ورود</a>
+                                        یا
+                                        <a class="text-white border-bottom" href="{% url 'signup' %}">ثبت نام</a>
+                                    </p>
+                                    <i class="fa-sharp fa-solid fa-arrow-left text-white fa-lg"></i>
+                                </div>
                             </div>
-                            <div class="d-flex justify-content-center align-items-center mt-3 mt-lg-0">
-                                <p class="text-white me-2 me-lg-3">
-                                    <a class="text-white border-bottom" href="{% url 'login' %}">ورود</a>
-                                    یا
-                                    <a class="text-white border-bottom" href="{% url 'signup' %}">ثبت نام</a>
-                                </p>
-                                <i class="fa-sharp fa-solid fa-arrow-left text-white fa-lg"></i>
-                            </div>
-                        </div>
                         {% endif %}
 
                     {% else %}
-                        <a style="color: #f3f3f3" href="{{ report.get_absolute_url }}"
-                           class="wrapper-icon d-flex align-items-center text-decoration-none">
-                            <i class="fa-solid fa-arrow-left fa-lg"></i>
-                            <span style="font-size: 18px" class="pe-1">بازگشت به صفحه خبر</span>
-                        </a>
+                        <p style="direction: rtl" class="d-flex align-items-center">
+                            <a style="color: #f3f3f3;" href="{{ report.get_absolute_url }}"
+                               class="wrapper-icon text-decoration-none">
+                                <i class="fa-solid fa-arrow-right fa-lg"></i>
+                                <span style="font-size: 18px" class="ps-2">بازگشت به صفحه خبر</span>
+                            </a>
+                        </p>
+                        {% if user.is_authenticated and request.user == report.author or user.is_superuser %}
+                             <div style="background-color: #eeeeee" class="col-12 card shadow mt-3 border-0 py-3 px-4">
+                                <form action="" method="POST">
+                                    {% csrf_token %}
+                                    {{ form|crispy }}
+                                    <div class="d-flex justify-content-end">
+                                        <button class="btn btn-success">
+                                            {% if request.resolver_match.view_name == "report_create" %}
+                                                ایجاد
+                                            {% else %}
+                                                ویرایش
+                                            {% endif %}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        {% else %}
+                            <div style="direction: rtl"
+                                 class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row mt-4">
+                                <p class="text-light">در حال حاضر شما دسترسی لازم برای ویرایش این خبر را ندارید!</p>
+                            </div>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

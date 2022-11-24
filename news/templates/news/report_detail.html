@@ -25,14 +25,14 @@
 
         @media screen and (max-width: 992px) {
             .title-news-detail {
-                font-size: 36px !important;
+                font-size: 28px !important;
                 line-height: 1.4;
             }
         }
 
         @media screen and (max-width: 576px) {
             .title-news-detail {
-                font-size: 28px !important;
+                font-size: 24px !important;
             }
 
             .text-news-detail,
@@ -102,15 +102,25 @@
                                 class="w-100 h-auto d-block" alt="">
                         </figure>
                         <h2 style="font-family: 'Vazir-Bold',serif;font-size: 50px;" class="text-white my-4 title-news-detail fs-2">{{ report.title }}</h2>
-                        <ul class="info-news-detail d-flex">
-                            <li class="text-white me-3">
+                        <ul class="info-news-detail mt-3 mb-5 d-flex flex-column flex-md-row">
+                            <li class="text-white mt-3 mt-md-0 me-md-3">
                                 <i class="fa-regular fa-user fa-lg"></i>
                                 <span class="ms-1">{{ report.author }}</span>
                             </li>
-                            <li class="text-white me-2">
+                            <li class="text-white mt-3 mt-md-0 me-md-2">
                                 <i class="fa-regular fa-calendar fa-lg"></i>
                                 <span class="ms-1">{{ report.datetime_modified }}</span>
                             </li>
+                            {% if user.is_authenticated and request.user == report.author or user.is_superuser %}
+                                <li class="text-white mt-3 mt-md-0 me-md-2">
+                                    <i class="fa-solid fa-pen-to-square fa-lg"></i>
+                                    <a href="{% url 'report_update' report.id %}" class="ms-1 text-primary">ویرایش</a>
+                                </li>
+                                <li class="text-white mt-3 mt-md-0 me-md-2">
+                                    <i class="fa-solid fa-trash fa-lg"></i>
+                                    <a href="{% url 'report_delete' report.id %}" class="ms-1 text-danger">حذف</a>
+                                </li>
+                            {% endif %}
                         </ul>
                         <p class="text-news-detail my-4">{{ report.description|linebreaks }}</p>
                     </div>

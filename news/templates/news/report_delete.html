@@ -1,32 +1,68 @@
 {% extends "_base.html" %}
 
-{% block page_title %}{% endblock page_title %}
+{% block page_title %}حذف خبر{% endblock page_title %}
+
+{% block page_style %}
+    <style>
+        .warning-form {
+            background-color: #dea514;
+        }
+
+        .warning-form p,
+        .warning-form a {
+            font-family: "Vazir-Bold", serif;
+            font-size: 18px;
+        }
+
+        .modal{
+            --bs-modal-margin: 0!important;
+        }
+    </style>
+{% endblock page_style %}
 
 {% block page_content %}
-    <section class="my-5 flex-grow-1">
+    <section class="py-5 flex-grow-1" style="background-color: #25272B">
         <div class="container">
             <div class="row">
-                <div class="col-12 d-flex align-items-center justify-content-center">
-                    <div class="modal d-block position-static" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">حذف خبر</h5>
-                                </div>
-                                <div class="modal-body">
-                                    <p>آیا از حذف خبر <span class="text-primary">{{ report.title }}</span> اطمینان دارید؟</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <a href="{{ report.get_absolute_url }}" class="btn btn-primary">بازگشت به خبر</a>
-                                    <form action="" method="POST">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">حذف
-                                    </button>
-                                    </form>
+                <div class="col-12">
+                    <p style="direction: rtl" class="d-flex align-items-center">
+                        <a style="color: #f3f3f3;" href="{{ report.get_absolute_url }}"
+                           class="wrapper-icon text-decoration-none">
+                            <i class="fa-solid fa-arrow-right fa-lg"></i>
+                            <span style="font-size: 18px" class="ps-2">بازگشت به صفحه خبر</span>
+                        </a>
+                    </p>
+                    {% if user.is_authenticated and request.user == report.author or user.is_superuser %}
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="modal m-0 mt-3 position-static d-flex">
+                                <div class="modal-dialog w-100">
+                                    <div style="background-color: #eeeeee" class="modal-content w-100">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">حذف خبر</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>آیا از حذف خبر <span class="text-primary">{{ report.title }}</span>
+                                                اطمینان دارید؟</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="{{ report.get_absolute_url }}" class="btn btn-primary">بازگشت به
+                                                خبر</a>
+                                            <form action="" method="POST">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">حذف
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    {% else %}
+                        <div style="direction: rtl"
+                             class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row mt-4">
+                            <p class="text-light">در حال حاضر شما دسترسی لازم برای حذف این خبر را ندارید!</p>
+                        </div>
+                    {% endif %}
 
                 </div>
             </div>
