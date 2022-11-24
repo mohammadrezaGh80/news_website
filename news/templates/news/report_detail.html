@@ -19,6 +19,10 @@
             font-size: 17px;
         }
 
+        p{
+            color: #fff;
+        }
+
         @media screen and (max-width: 992px) {
             .title-news-detail {
                 font-size: 36px !important;
@@ -108,7 +112,7 @@
                                 <span class="ms-1">{{ report.datetime_modified }}</span>
                             </li>
                         </ul>
-                        <p class="text-news-detail text-white my-4">{{ report.description }}</p>
+                        <p class="text-news-detail my-4">{{ report.description|linebreaks }}</p>
                     </div>
                     <div class="wrapper-comments card p-3 my-5">
                         <h3 style="font-family: 'Vazir-Bold',serif;" class="text-white">دیدگاه</h3>
