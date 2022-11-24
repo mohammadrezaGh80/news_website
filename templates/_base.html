@@ -14,12 +14,21 @@
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <title>{% block page_title %}{% endblock page_title %}</title>
-    {% block page_style %}{% endblock page_style %}
+    <style>
+        .dropdown-menu{
+            --bs-dropdown-link-hover-color: none;
+            --bs-dropdown-link-hover-bg: none;
+            --bs-dropdown-link-active-bg: none;
+            --bs-dropdown-link-active-color: none;
+        }
+    </style>
+    {% block page_style %}
+    {% endblock page_style %}
 </head>
 
-<body>
+<body style="min-height: 100vh" class="d-flex flex-column">
 
-<header class="position-sticky top-0" style="z-index: 999;">
+<header class="position-sticky top-0" style="z-index: 9999;">
     <nav class="navbar navbar-expand-md" style="background-color:#F54437">
         <div class="container-fluid">
             <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
@@ -27,22 +36,38 @@
                     aria-label="Toggle navigation">
                 <i style="font-size: 26px" class="fa-regular fa-bars fw-bold text-light"></i>
             </button>
-            <span class="order-md-1 order-0 d-flex align-items-center">
+            {% if user.is_authenticated %}
+                <div class="dropdown order-md-1 order-0">
+                    <span data-bs-toggle="dropdown" style="width: 40px;height: 40px;cursor: pointer;" class="d-flex border rounded-circle d-flex justify-content-center align-items-center">
+                        <span class="text-light" style="font-family: 'Vazir-Bold', serif;font-size: 20px;height: 25px;">{{ user.username.upper.0 }}</span>
+                    </span>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a style="font-family: 'Vazir-Bold', serif" class="dropdown-item" href="{% url 'password_change' %}">بازیابی رمز عبور</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a style="font-family: 'Vazir-Bold', serif" class="dropdown-item" href="{% url 'logout' %}">خروج از حساب کاربری</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <span class="order-md-1 order-0 d-flex align-items-center">
                     <i class="fa-regular fa-user text-light"></i>
-                    <a href="#" class="text-light ms-2">ثبت نام</a>
+                    <a href="{% url 'signup' %}" class="text-light ms-2">ثبت نام</a>
                     <span class="mx-1 fs-5 mt-1">/</span>
-                    <a href="#" class="text-light">ورود</a>
+                    <a href="{% url 'login' %}" class="text-light">ورود</a>
                 </span>
+            {% endif %}
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="#">خانه</a>
+                        <a class="nav-link {% if request.resolver_match.view_name == 'home' %}text-light{% endif %}"
+                           href="{% url 'home' %}">خانه</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">اخبار</a>
+                        <a class="nav-link {% if request.resolver_match.view_name == 'report_list' %}text-light{% endif %}"
+                           href="{% url 'report_list' %}">اخبار</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">ساخت خبر</a>
+                        <a class="nav-link {% if request.resolver_match.view_name == 'report_create' %}text-light{% endif %}"
+                           href="{% url 'report_create' %}">ساخت خبر</a>
                     </li>
                 </ul>
             </div>

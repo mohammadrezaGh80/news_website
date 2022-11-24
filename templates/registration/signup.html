@@ -38,7 +38,7 @@
 {% endblock page_style %}
 
 {% block page_content %}
-    <section class="py-5">
+    <section class="py-5 flex-grow-1">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-8 offset-lg-2">
@@ -50,14 +50,14 @@
                                         <img class="d-block w-100 h-100" src="{% static 'img/signup-image.jpg' %}" alt="">
                                     </figure>
                                     <div class="wrapper-link-login d-flex justify-content-center align-items-center flex-grow-1">
-                                        <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;" href="#">ورود به حساب من</a>
+                                        <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;" href="{% url 'login' %}">ورود به حساب</a>
                                     </div>
                                 </div>
                             </div>
                             <div style="min-height: inherit;" class="col-12 col-lg-6 order-0 order-lg-1">
                                 <div style="min-height: inherit;" class="left-side-signup d-flex flex-column px-4">
                                     <div class="wrapper-form d-flex flex-column">
-                                        <h4 class="mb-3" style="font-family: 'Vazir-Bold', serif;color: #3B5999;font-size: 25px;">ثبت نام در سایت</h4>
+                                        <h3 class="mb-3" style="font-family: 'Vazir-Bold', serif;color: #3B5999;font-size: 25px;">ثبت نام در سایت</h3>
                                         <form action="" method="POST" class="d-flex flex-column flex-grow-1 justify-content-center" style="direction: ltr">
                                             {% csrf_token %}
                                             {{ form|crispy }}

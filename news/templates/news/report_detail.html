@@ -97,28 +97,18 @@
                             <img src="{% static 'img/dino-reichmuth-A5rCN8626Ck-unsplash-1536x1086.jpg' %}"
                                 class="w-100 h-auto d-block" alt="">
                         </figure>
-                        <h2 style="font-family: 'Vazir-Bold',serif;font-size: 50px;" class="text-white my-4 title-news-detail">
-                            با سخت ترین ورزش جهان آشنا شوید</h2>
+                        <h2 style="font-family: 'Vazir-Bold',serif;font-size: 50px;" class="text-white my-4 title-news-detail">{{ report.title }}</h2>
                         <ul class="info-news-detail d-flex">
                             <li class="text-white me-3">
                                 <i class="fa-regular fa-user fa-lg"></i>
-                                <span class="ms-1">نوید</span>
+                                <span class="ms-1">{{ report.author }}</span>
                             </li>
                             <li class="text-white me-2">
                                 <i class="fa-regular fa-calendar fa-lg"></i>
-                                <span class="ms-1">خرداد 5, 1400</span>
+                                <span class="ms-1">{{ report.datetime_modified }}</span>
                             </li>
                         </ul>
-                        <p class="text-news-detail text-white my-4">
-                            لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک
-                            است، چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی
-                            تکنولوژی مورد نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی
-                            در شصت و سه درصد گذشته حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم
-                            افزارها شناخت بیشتری را برای طراحان رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان
-                            فارسی ایجاد کرد، در این صورت می توان امید داشت که تمام و دشواری موجود در ارائه راهکارها، و
-                            شرایط سخت تایپ به پایان رسد و زمان مورد نیاز شامل حروفچینی دستاوردهای اصلی، و جوابگوی سوالات
-                            پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار گیرد.
-                        </p>
+                        <p class="text-news-detail text-white my-4">{{ report.description }}</p>
                     </div>
                     <div class="wrapper-comments card p-3 my-5">
                         <h3 style="font-family: 'Vazir-Bold',serif;" class="text-white">دیدگاه</h3>

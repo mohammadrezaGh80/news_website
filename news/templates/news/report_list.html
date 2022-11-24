@@ -132,7 +132,7 @@
 {% endblock page_style %}
 
 {% block page_content %}
-    <section style="background-color: #25272B;" class="py-5">
+    <section style="background-color: #25272B;" class="py-5 flex-grow-1">
         <div class="container">
             <div class="row">
                 <div class="col-3 d-none d-lg-block">
@@ -192,7 +192,7 @@
                                 <img src="{% static 'img/beard-2286446_1920-1-1024x683.jpg' %}" alt=""
                                     class="w-100 h-100 d-block rounded-circle img-info">
                             </figure>
-                            <h4 class="text-light" style="font-family: 'Vazir-Bold', serif;">محمدرضا قرقابی</h4>
+                            <h4 class="text-light mt-2" style="font-family: 'Vazir-Bold', serif;">محمدرضا قرقابی</h4>
                                 <p class="text-center my-3 text-secondary">برنامه نویس بک اند با پایتون و دولوپر و طراح
                                     سایت</p>
                         </div>
@@ -212,7 +212,8 @@
                     </div>
                 </div>
                 <div class="col-lg-7 offset-lg-1 offset-0 col-12">
-                    <div class="mb-4">
+                    {% for report in reports %}
+                        <div class="mb-4">
                         <div class="d-flex position-relative wrapper-news overflow-hidden">
                             <div
                                 class="wrapper-news-img-icon bg-light rounded-circle d-none d-lg-inline-block position-absolute opacity-75">
@@ -221,7 +222,7 @@
                             <figure>
                                 <img src="https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/hero-images/advice/maps-satellite-images/satellite-image-of-globe.jpg"
                                     alt="" class="w-100 h-100 d-block">
-                                <figcaption class="position-absolute text-light news-img-caption fs-2">سرویس حمل و نقل در آلمان</figcaption>
+                                <figcaption class="position-absolute text-light news-img-caption fs-3">{{ report.title }}</figcaption>
                             </figure>
                             <div class="wrapper-news-img-number-comment position-absolute text-light d-none d-lg-inline-block">
                                 <span class="number-comment">2</span>
@@ -229,7 +230,7 @@
                             </div>
                             <div class="card-img-overlay overlay-img-news d-flex justify-content-center align-items-center">
                                 <div class="wrapper-continue-news">
-                                    <a href="#" class="text-light px-3 py-2 fs-5 position-relative">
+                                    <a href="{{ report.get_absolute_url }}" class="text-light px-3 py-2 fs-5 position-relative">
                                         <span>
                                             <i class="fst-normal">ادامه مطلب</i>
                                         </span>
@@ -238,58 +239,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <div class="d-flex position-relative wrapper-news overflow-hidden">
-                            <div
-                                class="wrapper-news-img-icon bg-light rounded-circle d-none d-lg-inline-block position-absolute opacity-75">
-                                <i class="fa-solid fa-camera text-dark p-2"></i>
-                            </div>
-                            <figure>
-                                <img src="https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/hero-images/advice/maps-satellite-images/satellite-image-of-globe.jpg"
-                                    alt="" class="w-100 h-100 d-block">
-                                <figcaption class="position-absolute text-light news-img-caption fs-2">سرویس حمل و نقل در آلمان</figcaption>
-                            </figure>
-                            <div class="wrapper-news-img-number-comment position-absolute text-light d-none d-lg-inline-block">
-                                <span class="number-comment">2</span>
-                                <i class="fa-regular fa-comment"></i>
-                            </div>
-                            <div class="card-img-overlay overlay-img-news d-flex justify-content-center align-items-center">
-                                <div class="wrapper-continue-news">
-                                    <a href="#" class="text-light px-3 py-2 fs-5 position-relative">
-                                        <span>
-                                            <i class="fst-normal">ادامه مطلب</i>
-                                        </span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <div class="d-flex position-relative wrapper-news overflow-hidden">
-                            <div
-                                class="wrapper-news-img-icon bg-light rounded-circle d-none d-lg-inline-block position-absolute opacity-75">
-                                <i class="fa-solid fa-camera text-dark p-2"></i>
-                            </div>
-                            <figure>
-                                <img src="https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/hero-images/advice/maps-satellite-images/satellite-image-of-globe.jpg"
-                                    alt="" class="w-100 h-100 d-block">
-                                <figcaption class="position-absolute text-light news-img-caption fs-2">سرویس حمل و نقل در آلمان</figcaption>
-                            </figure>
-                            <div class="wrapper-news-img-number-comment position-absolute text-light d-none d-lg-inline-block">
-                                <span class="number-comment">2</span>
-                                <i class="fa-regular fa-comment"></i>
-                            </div>
-                            <div class="card-img-overlay overlay-img-news d-flex justify-content-center align-items-center">
-                                <div class="wrapper-continue-news">
-                                    <a href="#" class="text-light px-3 py-2 fs-5 position-relative">
-                                        <span>
-                                            <i class="fst-normal">ادامه مطلب</i>
-                                        </span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {% endfor %}
+
                 </div>
             </div>
         </div>

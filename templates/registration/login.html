@@ -42,7 +42,7 @@
 {% endblock page_style %}
 
 {% block page_content %}
-    <section class="py-5">
+    <section class="py-5 flex-grow-1">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-8 offset-lg-2">
@@ -55,8 +55,8 @@
                                     </figure>
                                     <div class="wrapper-links d-flex justify-content-center align-items-center flex-grow-1">
                                         <div class="links d-flex flex-column align-items-center">
-                                            <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;" href="#" class="mb-2">ساخت یک حساب جدید</a>
-                                            <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;" href="#">فراموشی رمز عبور</a>
+                                            <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;" href="{% url 'signup' %}" class="mb-2">ساخت یک حساب جدید</a>
+                                            <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;" href="{% url 'password_reset' %}">فراموشی رمز عبور</a>
                                         </div>
                                     </div>
                                 </div>
@@ -64,7 +64,7 @@
                             <div style="min-height: inherit;" class="col-12 col-lg-6 order-0 order-lg-1">
                                 <div style="min-height: inherit;" class="left-side-login d-flex flex-column px-3">
                                     <div class="wrapper-form d-flex flex-column">
-                                        <h3 style="font-family: 'Vazir-Bold', serif;color: #3B5999;font-size: 25px;">ورود به سایت</h4>
+                                        <h3 style="font-family: 'Vazir-Bold', serif;color: #3B5999;font-size: 25px;">ورود به سایت</h3>
                                         <form action="" method="POST" class="d-flex flex-column flex-grow-1 justify-content-center" style="direction: ltr">
                                             {% csrf_token %}
                                             {{ form|crispy }}
@@ -72,20 +72,6 @@
                                                 <button type="submit" class="btn btn-primary btn-login mt-5">ورود</button>
                                             </div>
                                         </form>
-                                    </div>
-                                    <div class="wrapper-social-media d-flex justify-content-center align-items-center flex-grow-1 flex-column flex-lg-row mb-5 mb-lg-0">
-                                        <span style="font-family: 'Vazir-Bold', serif;font-size: 18px;color: #3B5999;">یا ورود با</span>
-                                        <ul class="social-media d-flex justify-content-center ms-lg-3 mt-3 mt-lg-0">
-                                            <li class="ms-2">
-                                                <a href="#" class="d-flex justify-content-center align-items-center text-light rounded" style="background-color: #3B5999;"><i class="fa-brands fa-facebook-f"></i></a>
-                                            </li>
-                                            <li class="ms-2">
-                                                <a href="#" class="d-flex justify-content-center align-items-center text-light rounded" style="background-color: #55ACEE;"><i class="fa-brands fa-twitter"></i></a>
-                                            </li>
-                                            <li class="ms-2">
-                                                <a href="#" class="d-flex justify-content-center align-items-center text-light rounded" style="background-color: #CD201F;"><i class="fa-brands fa-google"></i></a>
-                                            </li>
-                                        </ul>
                                     </div>
                                 </div>
                             </div>

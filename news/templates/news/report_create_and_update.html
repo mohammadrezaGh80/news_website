@@ -10,34 +10,38 @@
 {% endblock page_title %}
 
 {% block page_content %}
-    <section class="my-5" style="direction: ltr">
+    <section class="py-5 flex-grow-1" style="direction: ltr;background-color: #25272B">
         <div class="container">
             <div class="row">
-                {% if request.resolver_match.view_name == "report_create" %}
-                    <a href="{% url 'report_list' %}"
-                       class="wrapper-icon d-flex align-items-center text-decoration-none">
-                        <span style="font-size: 22px" class="material-symbols-outlined">arrow_back</span>
-                        <span style="font-size: 18px" class="ps-1">بازگشت به صفحه اصلی</span>
-                    </a>
-                {% else %}
-                    <a href="{{ report.get_absolute_url }}"
-                       class="wrapper-icon d-flex align-items-center text-decoration-none">
-                        <span style="font-size: 22px" class="material-symbols-outlined">arrow_back</span>
-                        <span style="font-size: 18px" class="ps-1">بازگشت به صفحه خبر</span>
-                    </a>
-                {% endif %}
-                <div class="col-12 card shadow bg-light mt-3 border-0 py-3 px-4">
-                    <form action="" method="POST">
-                        {% csrf_token %}
-                        {{ form|crispy }}
-                        <button class="btn btn-success">
-                            {% if request.resolver_match.view_name == "report_create" %}
-                                ایجاد
-                            {% else %}
-                                ویرایش
-                            {% endif %}
-                        </button>
-                    </form>
+                <div>
+                    {% if request.resolver_match.view_name == "report_create" %}
+                        <a style="color: #f3f3f3" href="{% url 'report_list' %}"
+                           class="wrapper-icon d-flex align-items-center text-decoration-none">
+                            <i class="fa-solid fa-arrow-left fa-lg"></i>
+                            <span style="font-size: 18px" class="pe-1">بازگشت به صفحه اصلی</span>
+                        </a>
+                    {% else %}
+                        <a style="color: #f3f3f3" href="{{ report.get_absolute_url }}"
+                           class="wrapper-icon d-flex align-items-center text-decoration-none">
+                            <i class="fa-solid fa-arrow-left fa-lg"></i>
+                            <span style="font-size: 18px" class="pe-1">بازگشت به صفحه خبر</span>
+                        </a>
+                    {% endif %}
+                    <div style="background-color: #eeeeee" class="col-12 card shadow mt-3 border-0 py-3 px-4">
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-success">
+                                    {% if request.resolver_match.view_name == "report_create" %}
+                                        ایجاد
+                                    {% else %}
+                                        ویرایش
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
