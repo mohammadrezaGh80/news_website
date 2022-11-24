@@ -30,12 +30,12 @@
             right: 0;
             text-align: center;
             color: #f8f8f8;
-            transform: translateY(55%);
+            transform: translateY(45%);
             transition: transform 0.5s linear;
         }
 
         .carousel-item:hover > .custom-carousel-caption {
-            transform: translateY(0%);
+            transform: translateY(-5%);
         }
 
         .latest-news .carousel .carousel-indicators {
@@ -80,33 +80,17 @@
                                     data-bs-slide-to="2" aria-label="Slide 3"></button>
                         </div>
                         <div class="carousel-inner">
-                            <a href="#" class="carousel-item active">
-                                <img src="{% static 'img/beard-2286446_1920-1-1024x683.jpg' %}"
-                                     style="object-fit: cover;"
-                                     class="d-block w-100" height="480" alt="...">
-                                <div class="custom-carousel-caption">
-                                    <h5 class="fs-2 mb-4">عنوان اولین اسلاید</h5>
-                                    <p class="">Some representative placeholder content for the first slide.</p>
-                                </div>
-                            </a>
-                            <a href="#" class="carousel-item">
-                                <img src="{% static 'img/beard-2286446_1920-1-1024x683.jpg' %}"
-                                     style="object-fit: cover;"
-                                     class="d-block w-100" height="480" alt="...">
-                                <div class="custom-carousel-caption">
-                                    <h5 class="fs-2 mb-4">عنوان دومین اسلاید</h5>
-                                    <p class="">Some representative placeholder content for the first slide.</p>
-                                </div>
-                            </a>
-                            <a href="#" class="carousel-item">
-                                <img src="{% static 'img/beard-2286446_1920-1-1024x683.jpg' %}"
-                                     style="object-fit: cover;"
-                                     class="d-block w-100" height="480" alt="...">
-                                <div class="custom-carousel-caption">
-                                    <h5 class="fs-2 mb-4">عنوان سومین اسلاید</h5>
-                                    <p class="">Some representative placeholder content for the first slide.</p>
-                                </div>
-                            </a>
+                            {% for news in last_news %}
+                                <a href="{{ news.get_absolute_url }}" class="carousel-item active">
+                                    <img src="{% static 'img/beard-2286446_1920-1-1024x683.jpg' %}"
+                                         style="object-fit: cover;"
+                                         class="d-block w-100" height="480" alt="...">
+                                    <div class="custom-carousel-caption">
+                                        <h5 style="font-size: 24px;font-family: 'Vazir-Bold', serif" class="mb-4 px-1">{{ news.title|truncatewords:10 }}</h5>
+                                        <p class="px-3">{{ news.description|truncatewords:15 }}</p>
+                                    </div>
+                                </a>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
