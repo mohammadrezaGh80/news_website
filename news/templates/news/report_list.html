@@ -35,7 +35,7 @@
             right: 30px;
         }
 
-        .wrapper-news-img-number-comment {
+        .wrapper-news-img-author-name {
             bottom: 20px;
             right: 30px;
         }
@@ -58,13 +58,13 @@
         .overlay-img-news .wrapper-continue-news a span::before,
         .overlay-img-news .wrapper-continue-news a span::after,
         .overlay-img-news .wrapper-continue-news a span i::after,
-        .overlay-img-news .wrapper-continue-news a span i::before{
+        .overlay-img-news .wrapper-continue-news a span i::before {
             content: "";
             position: absolute;
             background-color: #fff;
         }
 
-        .overlay-img-news .wrapper-continue-news a span::before{
+        .overlay-img-news .wrapper-continue-news a span::before {
             top: 0;
             left: 0;
             width: 60%;
@@ -72,7 +72,7 @@
             transition: width 0.2s linear;
         }
 
-        .overlay-img-news .wrapper-continue-news a span::after{
+        .overlay-img-news .wrapper-continue-news a span::after {
             bottom: 0;
             right: 0;
             width: 60%;
@@ -80,7 +80,7 @@
             transition: width 0.2s linear;
         }
 
-        .overlay-img-news .wrapper-continue-news a span i::after{
+        .overlay-img-news .wrapper-continue-news a span i::after {
             bottom: 0;
             right: 0;
             width: 1px;
@@ -88,7 +88,7 @@
             transition: height 0.2s linear;
         }
 
-        .overlay-img-news .wrapper-continue-news a span i::before{
+        .overlay-img-news .wrapper-continue-news a span i::before {
             left: 0;
             top: 0;
             width: 1px;
@@ -97,35 +97,35 @@
         }
 
         .overlay-img-news .wrapper-continue-news:hover > a span::after,
-        .overlay-img-news .wrapper-continue-news:hover > a span::before{
+        .overlay-img-news .wrapper-continue-news:hover > a span::before {
             width: 100%;
         }
 
         .overlay-img-news .wrapper-continue-news:hover > a span i::after,
-        .overlay-img-news .wrapper-continue-news:hover > a span i::before{
+        .overlay-img-news .wrapper-continue-news:hover > a span i::before {
             height: 100%;
         }
 
-        @media screen and (max-width:1200px) {
+        @media screen and (max-width: 1200px) {
             .wrapper-social-media-icons .top-icons a,
-            .wrapper-social-media-icons .bottom-icons a{
-                width: 70px!important;
-                height: 70px!important;
+            .wrapper-social-media-icons .bottom-icons a {
+                width: 70px !important;
+                height: 70px !important;
             }
         }
 
 
-        @media screen and (max-width:992px) {
+        @media screen and (max-width: 992px) {
             .news-img-caption {
-            bottom: 25px;
-            right: 20px;
-            font-size: 22px!important;
+                bottom: 25px;
+                right: 20px;
+                font-size: 22px !important;
             }
         }
 
-        @media screen and (max-width:576px) {
+        @media screen and (max-width: 576px) {
             .news-img-caption {
-            font-size: 16px!important;
+                font-size: 16px !important;
             }
         }
     </style>
@@ -137,44 +137,68 @@
             <div class="row">
                 <div class="col-3 d-none d-lg-block">
                     <div class="wrapper-search-box p-3" style="background-color: #202125;">
-                        <div class="input-group my-3">
-                            <input type="text" class="form-control shadow-none rounded-0" placeholder="جستجو..."
-                                name="search">
-                            <span class="input-group-text text-light border-0 rounded-0"
-                                style="background-color:#F54437"><i class="fa-solid fa-magnifying-glass"></i></span>
-                        </div>
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            <div class="input-group my-3">
+                                <input type="text" class="form-control shadow-none rounded-0" placeholder="جستجو..."
+                                       name="search">
+                                <button type="submit" class="input-group-text text-light border-0 rounded-0"
+                                        style="background-color:#F54437">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                            <p style="font-size: 18px" class="text-light">جستجو بر اساس:</p>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" name="title-input" type="checkbox" value="yes" id="title-checkbox" checked>
+                                <label class="form-check-label text-light" for="title-checkbox">
+                                    عنوان
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" name="author-input" type="checkbox" value="yes" id="author-checkbox" checked>
+                                <label class="form-check-label text-light" for="author-checkbox">
+                                    نویسنده
+                                </label>
+                            </div>
+                        </form>
                     </div>
                     <div class="wrapper-social-media p-3 mt-5" style="background-color: #202125;">
                         <div class="wrapper-custom-title d-inline-block py-2 px-4 position-relative"
-                            style="background-color:#F54437; border-bottom-right-radius: 15px;">
+                             style="background-color:#F54437; border-bottom-right-radius: 15px;">
                             <span style="font-family: 'Vazir-Bold', serif;" class="text-light text-custom-title">ما در
                                 رسانه ها</span>
                         </div>
                         <div class="wrapper-social-media-icons mt-3">
                             <div class="top-icons d-flex justify-content-between mb-2">
-                                <a href="#" class="d-flex justify-content-center align-items-center flex-column me-1" style="width: 85px;height:85px;background-color: #3B5999;">
+                                <a href="#" class="d-flex justify-content-center align-items-center flex-column me-1"
+                                   style="width: 85px;height:85px;background-color: #3B5999;">
                                     <i class="fa-brands fa-facebook-f text-light"></i>
                                     <span class="text-light mt-2" style="font-size: 13px;">فیسبوک</span>
                                 </a>
-                                <a href="#" class="d-flex justify-content-center align-items-center flex-column me-1" style="width: 85px;height:85px;background-color: #55ACEE;">
+                                <a href="#" class="d-flex justify-content-center align-items-center flex-column me-1"
+                                   style="width: 85px;height:85px;background-color: #55ACEE;">
                                     <i class="fa-brands fa-twitter text-light"></i>
                                     <span class="text-light mt-2" style="font-size: 13px;">توییتر</span>
                                 </a>
-                                <a href="#" class="d-flex justify-content-center align-items-center flex-column" style="width: 85px;height:85px;background-color: #BD081C;">
+                                <a href="#" class="d-flex justify-content-center align-items-center flex-column"
+                                   style="width: 85px;height:85px;background-color: #BD081C;">
                                     <i class="fa-brands fa-pinterest-p text-light"></i>
                                     <span class="text-light mt-2" style="font-size: 13px;">پینترست</span>
                                 </a>
                             </div>
                             <div class="bottom-icons d-flex justify-content-between">
-                                <a href="#" class="d-flex justify-content-center align-items-center flex-column me-1" style="width: 85px;height:85px;background-color: #0077B5;">
+                                <a href="#" class="d-flex justify-content-center align-items-center flex-column me-1"
+                                   style="width: 85px;height:85px;background-color: #0077B5;">
                                     <i class="fa-brands fa-linkedin-in text-light"></i>
                                     <span class="text-light mt-2" style="font-size: 13px;">لینکدین</span>
                                 </a>
-                                <a href="#" class="d-flex justify-content-center align-items-center flex-column me-1" style="width: 85px;height:85px;background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);">
+                                <a href="#" class="d-flex justify-content-center align-items-center flex-column me-1"
+                                   style="width: 85px;height:85px;background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);">
                                     <i class="fa-brands fa-instagram text-light"></i>
                                     <span class="text-light mt-2" style="font-size: 13px;">اینستاگرام</span>
                                 </a>
-                                <a href="#" class="d-flex justify-content-center align-items-center flex-column" style="width: 85px;height:85px;background-color: #CD201F;">
+                                <a href="#" class="d-flex justify-content-center align-items-center flex-column"
+                                   style="width: 85px;height:85px;background-color: #CD201F;">
                                     <i class="fa-brands fa-youtube text-light"></i>
                                     <span class="text-light mt-2" style="font-size: 13px;">یوتیوب</span>
                                 </a>
@@ -183,29 +207,29 @@
                     </div>
                     <div class="wrapper-info p-3 mt-5" style="background-color: #202125;">
                         <div class="wrapper-custom-title d-inline-block py-2 px-4 position-relative"
-                            style="background-color:#F54437; border-bottom-right-radius: 15px;">
+                             style="background-color:#F54437; border-bottom-right-radius: 15px;">
                             <span style="font-family: 'Vazir-Bold', serif;" class="text-light text-custom-title">درباره
                                 نویسنده</span>
                         </div>
                         <div class="wrapper-personal-info mt-4 d-flex align-items-center flex-column">
                             <figure style="width: 150px; height: 150px;">
                                 <img src="{% static 'img/beard-2286446_1920-1-1024x683.jpg' %}" alt=""
-                                    class="w-100 h-100 d-block rounded-circle img-info">
+                                     class="w-100 h-100 d-block rounded-circle img-info">
                             </figure>
                             <h4 class="text-light mt-2" style="font-family: 'Vazir-Bold', serif;">محمدرضا قرقابی</h4>
-                                <p class="text-center my-3 text-secondary">برنامه نویس بک اند با پایتون و دولوپر و طراح
-                                    سایت</p>
+                            <p class="text-center my-3 text-secondary">برنامه نویس بک اند با پایتون و دولوپر و طراح
+                                سایت</p>
                         </div>
                         <div class="wrapper-personal-social-media">
                             <div class="d-flex justify-content-center">
                                 <a href="#" class="d-flex justify-content-center align-items-center flex-column me-2"
-                                    style="width: 40px;height:40px;background-color: #0077B5;"><i
+                                   style="width: 40px;height:40px;background-color: #0077B5;"><i
                                         class="fa-brands fa-linkedin-in text-light"></i></a>
                                 <a href="#" class="d-flex justify-content-center align-items-center flex-column me-2"
-                                    style="width: 40px;height:40px;background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);"><i
+                                   style="width: 40px;height:40px;background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);"><i
                                         class="fa-brands fa-instagram text-light"></i></a>
                                 <a href="#" class="d-flex justify-content-center align-items-center flex-column me-2"
-                                    style="width: 40px;height:40px;background-color: #CD201F;"><i
+                                   style="width: 40px;height:40px;background-color: #CD201F;"><i
                                         class="fa-brands fa-youtube text-light"></i></a>
                             </div>
                         </div>
@@ -214,31 +238,33 @@
                 <div class="col-lg-7 offset-lg-1 offset-0 col-12">
                     {% for report in reports %}
                         <div class="mb-4">
-                        <div class="d-flex position-relative wrapper-news overflow-hidden">
-                            <div
-                                class="wrapper-news-img-icon bg-light rounded-circle d-none d-lg-inline-block position-absolute opacity-75">
-                                <i class="fa-solid fa-camera text-dark p-2"></i>
-                            </div>
-                            <figure>
-                                <img src="https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/hero-images/advice/maps-satellite-images/satellite-image-of-globe.jpg"
-                                    alt="" class="w-100 h-100 d-block">
-                                <figcaption class="position-absolute text-light news-img-caption fs-3">{{ report.title }}</figcaption>
-                            </figure>
-                            <div class="wrapper-news-img-number-comment position-absolute text-light d-none d-lg-inline-block">
-                                <span class="number-comment">2</span>
-                                <i class="fa-regular fa-comment"></i>
-                            </div>
-                            <div class="card-img-overlay overlay-img-news d-flex justify-content-center align-items-center">
-                                <div class="wrapper-continue-news">
-                                    <a href="{{ report.get_absolute_url }}" class="text-light px-3 py-2 fs-5 position-relative">
+                            <div class="d-flex position-relative wrapper-news overflow-hidden">
+                                <div
+                                        class="wrapper-news-img-icon bg-light rounded-circle d-none d-lg-inline-block position-absolute opacity-75">
+                                    <i class="fa-solid fa-camera text-dark p-2"></i>
+                                </div>
+                                <figure>
+                                    <img src="https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/hero-images/advice/maps-satellite-images/satellite-image-of-globe.jpg"
+                                         alt="" class="w-100 h-100 d-block">
+                                    <figcaption
+                                            class="position-absolute text-light news-img-caption fs-3">{{ report.title }}</figcaption>
+                                </figure>
+                                <div class="wrapper-news-img-author-name position-absolute text-light d-none d-lg-inline-block">
+                                    <i class="fa-regular fa-user"></i>
+                                    <span class="author-name ps-1">{{ report.author }}</span>
+                                </div>
+                                <div class="card-img-overlay overlay-img-news d-flex justify-content-center align-items-center">
+                                    <div class="wrapper-continue-news">
+                                        <a href="{{ report.get_absolute_url }}"
+                                           class="text-light px-3 py-2 fs-5 position-relative">
                                         <span>
                                             <i class="fst-normal">ادامه مطلب</i>
                                         </span>
-                                    </a>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     {% endfor %}
 
                 </div>

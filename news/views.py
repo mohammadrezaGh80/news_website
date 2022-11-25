@@ -1,17 +1,38 @@
+from django.db.models import Q
 from django.views import generic
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model
 
 from .models import Report
 from .forms import ReportForm
 
 
-class ReportListView(generic.ListView):
-    template_name = "news/report_list.html"
-    context_object_name = "reports"
+# class ReportListView(generic.ListView):
+#     template_name = "news/report_list.html"
+#     context_object_name = "reports"
+#
+#     def get_queryset(self):
+#         return Report.objects.order_by("-datetime_modified")
 
-    def get_queryset(self):
-        return Report.objects.order_by("-datetime_modified")
+
+def report_list_view(request):
+    if request.method == "POST":
+        authors = get_user_model().objects.filter(
+            username__contains=request.POST["search"]
+        ) if "author-input" in request.POST else ''
+
+        titles = Report.objects.filter(
+            title__contains=request.POST["search"]
+        ) if "title-input" in request.POST else ''
+
+        reports = Report.objects.filter(
+            Q(title__in=titles) |
+            Q(author__in=authors)
+        ).order_by("-datetime_modified")
+    else:
+        reports = Report.objects.order_by("-datetime_modified")
+    return render(request, "news/report_list.html", context={"reports": reports})
 
 
 class ReportDetailView(generic.DetailView):
