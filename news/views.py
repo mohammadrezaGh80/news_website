@@ -8,16 +8,18 @@ from .models import Report
 from .forms import ReportForm
 
 
-# class ReportListView(generic.ListView):
-#     template_name = "news/report_list.html"
-#     context_object_name = "reports"
-#
-#     def get_queryset(self):
-#         return Report.objects.order_by("-datetime_modified")
+class ReportListView(generic.ListView):
+    is_all_blank = False
+    is_exist = True
+    template_name = "news/report_list.html"
+    context_object_name = "reports"
+    extra_context = {"is_all_blank": is_all_blank,
+                     "is_exist": is_exist}
 
+    def get_queryset(self):
+        return Report.objects.order_by("-datetime_modified")
 
-def report_list_view(request):
-    if request.method == "POST":
+    def post(self, request, *args, **kwargs):
         authors = get_user_model().objects.filter(
             username__contains=request.POST["search"]
         ) if "author-input" in request.POST else ''
@@ -26,13 +28,40 @@ def report_list_view(request):
             title__contains=request.POST["search"]
         ) if "title-input" in request.POST else ''
 
+        if titles == '' and authors == '':
+            self.is_all_blank = True
+        elif not (titles or authors):
+            self.is_exist = False
+
         reports = Report.objects.filter(
-            Q(title__in=titles) |
-            Q(author__in=authors)
+            Q(title__in=[*titles]) |
+            Q(author__in=[*authors])
         ).order_by("-datetime_modified")
-    else:
-        reports = Report.objects.order_by("-datetime_modified")
-    return render(request, "news/report_list.html", context={"reports": reports})
+
+        return render(request,
+                      self.template_name,
+                      context={self.context_object_name: reports,
+                               "is_all_blank": self.is_all_blank,
+                               "is_exist": self.is_exist})
+
+
+# def report_list_view(request):
+#     if request.method == "POST":
+#         authors = get_user_model().objects.filter(
+#             username__contains=request.POST["search"]
+#         ) if "author-input" in request.POST else ''
+#
+#         titles = Report.objects.filter(
+#             title__contains=request.POST["search"]
+#         ) if "title-input" in request.POST else ''
+#
+#         reports = Report.objects.filter(
+#             Q(title__in=titles) |
+#             Q(author__in=authors)
+#         ).order_by("-datetime_modified")
+#     else:
+#         reports = Report.objects.order_by("-datetime_modified")
+#     return render(request, "news/report_list.html", context={"reports": reports})
 
 
 class ReportDetailView(generic.DetailView):

@@ -128,6 +128,16 @@
                 font-size: 16px !important;
             }
         }
+
+        .warning-form {
+            background-color: #dea514;
+        }
+
+        .warning-form p,
+        .warning-form a {
+            font-family: "Vazir-Bold", serif;
+            font-size: 18px;
+        }
     </style>
 {% endblock page_style %}
 
@@ -149,13 +159,15 @@
                             </div>
                             <p style="font-size: 18px" class="text-light">جستجو بر اساس:</p>
                             <div class="form-check mt-2">
-                                <input class="form-check-input" name="title-input" type="checkbox" value="yes" id="title-checkbox" checked>
+                                <input class="form-check-input" name="title-input" type="checkbox" value="yes"
+                                       id="title-checkbox" checked>
                                 <label class="form-check-label text-light" for="title-checkbox">
                                     عنوان
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" name="author-input" type="checkbox" value="yes" id="author-checkbox" checked>
+                                <input class="form-check-input" name="author-input" type="checkbox" value="yes"
+                                       id="author-checkbox" checked>
                                 <label class="form-check-label text-light" for="author-checkbox">
                                     نویسنده
                                 </label>
@@ -236,6 +248,23 @@
                     </div>
                 </div>
                 <div class="col-lg-7 offset-lg-1 offset-0 col-12">
+                    {% if is_all_blank %}
+                        <div class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row">
+                            <div class="d-flex flex-column flex-lg-row align-items-center py-2 py-lg-0">
+                                <i class="fa-solid fa-circle-exclamation mb-3 mb-lg-0 me-lg-2 fa-xl"></i>
+                                <p class="text-white text-center text-lg-start">متاسفانه هیچ دسته بندی برای جست و جو
+                                    انتخاب نکردید!</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if not is_exist %}
+                        <div class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row">
+                            <div class="d-flex flex-column flex-lg-row align-items-center py-2 py-lg-0">
+                                <i class="fa-solid fa-face-frown mb-3 mb-lg-0 me-lg-2 fa-xl"></i>
+                                <p class="text-white text-center text-lg-start">متاسفانه خبری پیدا نشد...!</p>
+                            </div>
+                        </div>
+                    {% endif %}
                     {% for report in reports %}
                         <div class="mb-4">
                             <div class="d-flex position-relative wrapper-news overflow-hidden">
