@@ -15,6 +15,7 @@ class ReportListView(generic.ListView):
     context_object_name = "reports"
     extra_context = {"is_all_blank": is_all_blank,
                      "is_exist": is_exist}
+    paginate_by = 4
 
     def get_queryset(self):
         return Report.objects.order_by("-datetime_modified")
