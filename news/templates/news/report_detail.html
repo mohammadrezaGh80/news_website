@@ -1,5 +1,6 @@
 {% extends "_base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block page_title %}{{ report.title }}{% endblock page_title %}
 
@@ -19,7 +20,7 @@
             font-size: 17px;
         }
 
-        p{
+        p {
             color: #fff;
         }
 
@@ -41,12 +42,16 @@
             }
         }
 
-        #input-comment {
-            width: min(600px, 100%);
-            background-color: rgb(222, 222, 222);
+        form textarea {
+            width: min(600px, 100%) !important;
+            background-color: rgb(222, 222, 222) !important;
         }
 
-        .label-input-comment,
+        .asteriskField {
+            padding-right: 5px;
+        }
+
+        form label,
         .text-form {
             color: rgb(211, 211, 211);
             font-size: 18px;
@@ -61,32 +66,53 @@
             font-size: 15px;
         }
 
-        .wrapper-comments{
+        .wrapper-comments {
             background-color: #1B344D;
         }
 
-        .warning-comment{
+        .warning-comment {
             background-color: #dea514;
         }
 
         .warning-comment p,
-        .warning-comment a{
+        .warning-comment a {
             font-family: "Vazir-Bold", serif;
             font-size: 18px;
         }
 
-        .comment{
+        .comment {
             background-color: #061B33;
         }
 
-        .user-profile-img{
+        .user-profile-img {
             width: 60px;
             height: 60px;
         }
 
-        .text-comment{
-            font-size: 18px;
-            line-height: 1.7;
+        .text-comment {
+            font-size: 16px;
+            line-height: 1.9;
+        }
+
+        .suggestion-comment {
+            background-color: #A3DEF2;
+        }
+
+        .days-ago{
+            color: rgb(204, 204, 204);
+            font-size: 14px;
+            width: fit-content;
+        }
+
+        .days-ago::after {
+            content: "روز پیش";
+            position: absolute;
+            left: -50px;
+            top: -3px;
+            color: rgb(204, 204, 204);
+            display: inline-block;
+            font-size: 14px;
+            white-space: nowrap;
         }
     </style>
 {% endblock page_style %}
@@ -99,9 +125,10 @@
                     <div class="wrapper-news-detail">
                         <figure class="wrapper-news-detail-img">
                             <img src="{% static 'img/dino-reichmuth-A5rCN8626Ck-unsplash-1536x1086.jpg' %}"
-                                class="w-100 h-auto d-block" alt="">
+                                 class="w-100 h-auto d-block" alt="">
                         </figure>
-                        <h2 style="font-family: 'Vazir-Bold',serif;font-size: 50px;" class="text-white my-4 title-news-detail fs-2">{{ report.title }}</h2>
+                        <h2 style="font-family: 'Vazir-Bold',serif;font-size: 50px;"
+                            class="text-white my-4 title-news-detail fs-2">{{ report.title }}</h2>
                         <ul class="info-news-detail mt-3 mb-5 d-flex flex-column flex-md-row">
                             <li class="text-white mt-3 mt-md-0 me-md-3">
                                 <i class="fa-regular fa-user fa-lg"></i>
@@ -122,94 +149,71 @@
                                 </li>
                             {% endif %}
                         </ul>
-                        <p class="text-news-detail my-4">{{ report.description|linebreaks }}</p>
+                        <p class="text-news-detail mt-3 mb-4">{{ report.description|linebreaksbr }}</p>
                     </div>
                     <div class="wrapper-comments card p-3 my-5">
-                        <h3 style="font-family: 'Vazir-Bold',serif;" class="text-white">دیدگاه</h3>
-                        <div class="warning-comment card py-3 px-4 justify-content-lg-between flex-lg-row mt-4">
-                            <div class="d-flex flex-column flex-lg-row align-items-center py-2 py-lg-0">
-                                <i class="fa-solid fa-user text-white mb-3 mb-lg-0 me-lg-3 fa-lg"></i>
-                                <p class="text-white text-center text-lg-start">برای ارسال دیدگاه لازم است وارد شده یا ثبت نام کنید</p>
+                        <h3 style="font-family: 'Vazir-Bold',serif;" class="text-white mb-3">دیدگاه ها</h3>
+                        {% if not user.is_authenticated %}
+                            <div class="warning-comment card py-3 px-4 justify-content-lg-between flex-lg-row">
+                                <div class="d-flex flex-column flex-lg-row align-items-center py-2 py-lg-0">
+                                    <i class="fa-solid fa-user text-white mb-3 mb-lg-0 me-lg-3 fa-lg"></i>
+                                    <p class="text-white text-center text-lg-start">برای ارسال دیدگاه لازم است وارد شده
+                                        یا ثبت نام کنید</p>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center mt-3 mt-lg-0">
+                                    <p class="text-white me-2 me-lg-3">
+                                        <a class="text-white border-bottom" href="{% url 'login' %}">ورود</a>
+                                        یا
+                                        <a class="text-white border-bottom" href="{% url 'signup' %}">ثبت نام</a>
+                                    </p>
+                                    <i class="fa-sharp fa-solid fa-arrow-left text-white fa-lg"></i>
+                                </div>
                             </div>
-                            <div class="d-flex justify-content-center align-items-center mt-3 mt-lg-0">
-                                <p class="text-white me-2 me-lg-3">
-                                    <a class="text-white border-bottom" href="#">ورود</a>
-                                    یا
-                                    <a class="text-white border-bottom" href="#">ثبت نام</a>
-                                </p>
-                                <i class="fa-sharp fa-solid fa-arrow-left text-white fa-lg"></i>
-                            </div>
-                        </div>
+                        {% else %}
+                            {% if comments.count == 0 %}
+                                <div class="suggestion-comment py-3 px-4 card">
+                                    <p class="text-primary">نظری وجود ندارد! شما اولین نفر باشید!</p>
+                                </div>
+                            {% endif %}
+                        {% endif %}
                         <ul class="comments">
-                            <li class="comment card p-3 my-5">
-                                <div class="top-section-comment border-bottom pb-4 border-secondary">
-                                    <div class="wrapper-info-user d-flex align-items-center">
-                                        <figure class="user-profile-img">
-                                            <img src="https://roocket.ir/img/default.png" alt="" class="w-100 h-auto d-block rounded-circle">
-                                        </figure>
-                                        <p class="text-white d-flex flex-column ms-2">
-                                            <span style="font-family: 'Vazir-Bold',serif;" class="fs-5 mb-1">محمدرضا</span>
-                                            <span style="color: rgb(204, 204, 204);font-size: 13px;">1 هفته پیش</span>
-                                        </p>
+                            {% for comment in comments %}
+                                <li class="comment card p-3 my-5">
+                                    <div class="top-section-comment border-bottom pb-4 border-secondary">
+                                        <div class="wrapper-info-user d-flex align-items-center">
+                                            <figure class="user-profile-img">
+                                                <img src="https://roocket.ir/img/default.png" alt=""
+                                                     class="w-100 h-auto d-block rounded-circle">
+                                            </figure>
+                                            <p class="text-white d-flex flex-column ms-2">
+                                                <span style="font-family: 'Vazir-Bold',serif;"
+                                                      class="fs-5 mb-1">{{ comment.user.username }}</span>
+                                                {% if comment.calculate_days_diff == 0 %}
+                                                    <span style="color: rgb(204, 204, 204);font-size: 13px;">امروز</span>
+                                                {% else %}
+                                                    <span class="days-ago position-relative">{{ comment.calculate_days_diff }}</span>
+                                                {% endif %}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="bottom-section-comment">
-                                    <p class="text-comment mt-3 text-white">
-                                        سلام کلاسی css که داری استفاده میکنی سمت سرور next به یه صورته وقتی میاد سمت client لود میشه تغییر میکنه
-                                    </p>
-                                </div>
-                            </li>
-                            <li class="comment card p-3 my-5">
-                                <div class="top-section-comment border-bottom pb-4 border-secondary">
-                                    <div class="wrapper-info-user d-flex align-items-center">
-                                        <figure class="user-profile-img">
-                                            <img src="https://roocket.ir/img/default.png" alt="" class="w-100 h-auto d-block rounded-circle">
-                                        </figure>
-                                        <p class="text-white d-flex flex-column ms-2">
-                                            <span style="font-family: 'Vazir-Bold', serif;" class="fs-5 mb-1">محمدرضا</span>
-                                            <span style="color: rgb(204, 204, 204);font-size: 13px;">1 هفته پیش</span>
-                                        </p>
+                                    <div class="bottom-section-comment">
+                                        <p class="text-comment mt-3 text-white">{{ comment.text|linebreaksbr }}</p>
                                     </div>
-                                </div>
-                                <div class="bottom-section-comment">
-                                    <p class="text-comment mt-3 text-white">
-                                        سلام کلاسی css که داری استفاده میکنی سمت سرور next به یه صورته وقتی میاد سمت client لود میشه تغییر میکنه
-                                    </p>
-                                </div>
-                            </li>
-                            <li class="comment card p-3 my-5">
-                                <div class="top-section-comment border-bottom pb-4 border-secondary">
-                                    <div class="wrapper-info-user d-flex align-items-center">
-                                        <figure class="user-profile-img">
-                                            <img src="https://roocket.ir/img/default.png" alt="" class="w-100 h-auto d-block rounded-circle">
-                                        </figure>
-                                        <p class="text-white d-flex flex-column ms-2">
-                                            <span style="font-family: 'Vazir-Bold', serif;" class="fs-5 mb-1">محمدرضا</span>
-                                            <span style="color: rgb(204, 204, 204);font-size: 13px;">1 هفته پیش</span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="bottom-section-comment">
-                                    <p class="text-comment mt-3 text-white">
-                                        سلام کلاسی css که داری استفاده میکنی سمت سرور next به یه صورته وقتی میاد سمت client لود میشه تغییر میکنه
-                                    </p>
-                                </div>
-                            </li>
+                                </li>
+                            {% endfor %}
                         </ul>
                     </div>
-
-                    <div class="send-comment border border-secondary p-3">
-                        <h3 style="font-family: 'Vazir-Bold', serif;" class="text-white">دیدگاهتان را بنویسید</h3>
-                        <p class="my-3 text-form">بخش‌های موردنیاز علامت‌گذاری شده‌اند *</p>
-                        <form action="" method="POST" class="d-flex flex-column">
-                            <label for="input-comment" class="label-input-comment mb-2">
-                                <span>دیدگاه</span>
-                                <span>*</span>
-                            </label>
-                            <textarea name="text-comment" id="input-comment" rows="10" class="p-2"></textarea>
-                            <button type="submit" class="mt-3 button-input">فرستادن دیدگاه</button>
-                        </form>
-                    </div>
+                    {% if user.is_authenticated %}
+                        <div class="send-comment border border-secondary p-3">
+                            <h3 style="font-family: 'Vazir-Bold', serif;" class="text-white">دیدگاهتان را بنویسید</h3>
+                            <p class="my-3 text-form">بخش‌های موردنیاز علامت‌گذاری شده‌اند *</p>
+                            <form action="" method="POST" class="d-flex flex-column">
+                                {% csrf_token %}
+                                {{ comment_form|crispy }}
+                                <button type="submit" class="mt-3 button-input">فرستادن دیدگاه</button>
+                            </form>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

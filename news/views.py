@@ -1,11 +1,12 @@
 from django.db.models import Q
 from django.views import generic
 from django.urls import reverse_lazy
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
+from datetime import date
 
 from .models import Report
-from .forms import ReportForm
+from .forms import ReportForm, CommentForm
 
 
 class ReportListView(generic.ListView):
@@ -65,16 +66,36 @@ class ReportListView(generic.ListView):
 #     return render(request, "news/report_list.html", context={"reports": reports})
 
 
-class ReportDetailView(generic.DetailView):
-    model = Report
-    template_name = "news/report_detail.html"
-    context_object_name = "report"
+# class ReportDetailView(generic.DetailView):
+#     model = Report
+#     template_name = "news/report_detail.html"
+#     context_object_name = "report"
+
+
+def report_detail_view(request, pk):
+    report = get_object_or_404(Report, pk=pk)
+    if request.method == "POST":
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.user = request.user
+            comment.report = report
+            comment.save()
+            comment_form = CommentForm()
+    else:
+        comment_form = CommentForm()
+
+    return render(request, "news/report_detail.html",
+                  context={"report": report,
+                           "comment_form": comment_form,
+                           "comments": report.comments.order_by("-datetime_created")})
 
 
 # class ReportCreateView(generic.CreateView):
 #     model = Report
 #     fields = ["title", "description", "author"]
 #     template_name = "news/report_create_and_update.html"
+
 
 def report_create_view(request):
     if request.method == "POST":
