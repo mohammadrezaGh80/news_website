@@ -3,7 +3,6 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
-from datetime import date
 
 from .models import Report
 from .forms import ReportForm, CommentForm
@@ -99,7 +98,7 @@ def report_detail_view(request, pk):
 
 def report_create_view(request):
     if request.method == "POST":
-        form = ReportForm(request.POST)
+        form = ReportForm(request.POST, request.FILES)
         if form.is_valid():
             report = form.save(commit=False)
             report.author = request.user

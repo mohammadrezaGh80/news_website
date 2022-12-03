@@ -38,11 +38,11 @@
                         </p>
                         {% if user.is_authenticated %}
                             <div style="background-color: #eeeeee" class="col-12 card shadow mt-3 border-0 py-3 px-4">
-                                <form action="" method="POST">
+                                <form action="" method="POST" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     {{ form|crispy }}
                                     <div class="d-flex justify-content-end">
-                                        <button class="btn btn-success">
+                                        <button type="submit" class="btn btn-success">
                                             {% if request.resolver_match.view_name == "report_create" %}
                                                 ایجاد
                                             {% else %}
@@ -80,8 +80,8 @@
                             </a>
                         </p>
                         {% if user.is_authenticated and request.user == report.author or user.is_superuser %}
-                             <div style="background-color: #eeeeee" class="col-12 card shadow mt-3 border-0 py-3 px-4">
-                                <form action="" method="POST">
+                            <div style="background-color: #eeeeee" class="col-12 card shadow mt-3 border-0 py-3 px-4">
+                                <form action="" method="POST" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     {{ form|crispy }}
                                     <div class="d-flex justify-content-end">
@@ -98,7 +98,8 @@
                         {% else %}
                             <div style="direction: rtl"
                                  class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row mt-4">
-                                <p class="text-light text-center text-lg-start">در حال حاضر شما دسترسی لازم برای ویرایش این خبر را ندارید!</p>
+                                <p class="text-light text-center text-lg-start">در حال حاضر شما دسترسی لازم برای ویرایش
+                                    این خبر را ندارید!</p>
                             </div>
                         {% endif %}
                     {% endif %}

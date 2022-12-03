@@ -25,19 +25,23 @@
             cursor: pointer;
         }
 
-        .news-img-caption {
-            bottom: 45px;
-            right: 30px;
-        }
 
         .wrapper-news-img-icon {
             top: 20px;
             right: 30px;
         }
 
-        .wrapper-news-img-author-name {
-            bottom: 20px;
-            right: 30px;
+        .news-img-caption{
+            line-height: 1.4;
+        }
+
+        .wrapper-text-news {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            padding: 10px 15px;
+            background-color: rgba(0, 0, 0, 0.7);
         }
 
         .img-info {
@@ -160,7 +164,7 @@
     <section style="background-color: #25272B;" class="py-5 flex-grow-1">
         <div class="container">
             <div class="row">
-                <div class="col-3 d-none d-lg-block">
+                <div class="col-lg-3 col-12">
                     <div class="wrapper-search-box p-3" style="background-color: #202125;">
                         <form action="" method="POST">
                             {% csrf_token %}
@@ -189,7 +193,7 @@
                             </div>
                         </form>
                     </div>
-                    <div class="wrapper-social-media p-3 mt-5" style="background-color: #202125;">
+                    <div class="wrapper-social-media p-3 mt-5 d-none d-lg-block" style="background-color: #202125;">
                         <div class="wrapper-custom-title d-inline-block py-2 px-4 position-relative"
                              style="background-color:#F54437; border-bottom-right-radius: 15px;">
                             <span style="font-family: 'Vazir-Bold', serif;" class="text-light text-custom-title">ما در
@@ -232,7 +236,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="wrapper-info p-3 mt-5" style="background-color: #202125;">
+                    <div class="wrapper-info p-3 mt-5 d-none d-lg-block" style="background-color: #202125;">
                         <div class="wrapper-custom-title d-inline-block py-2 px-4 position-relative"
                              style="background-color:#F54437; border-bottom-right-radius: 15px;">
                             <span style="font-family: 'Vazir-Bold', serif;" class="text-light text-custom-title">درباره
@@ -262,7 +266,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-7 offset-lg-1 offset-0 col-12 d-flex flex-column">
+                <div class="col-lg-7 offset-lg-1 offset-0 col-12 d-flex flex-column mt-5 mt-lg-0">
                     {% if is_all_blank %}
                         <div class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row">
                             <div class="d-flex flex-column flex-lg-row align-items-center py-2 py-lg-0">
@@ -281,21 +285,22 @@
                         </div>
                     {% endif %}
                     {% for report in reports %}
-                        <div class="mb-4">
+                        <div class="mb-5">
                             <div class="d-flex position-relative wrapper-news overflow-hidden">
                                 <div
                                         class="wrapper-news-img-icon bg-light rounded-circle d-none d-lg-inline-block position-absolute opacity-75">
                                     <i class="fa-solid fa-camera text-dark p-2"></i>
                                 </div>
                                 <figure>
-                                    <img src="https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/hero-images/advice/maps-satellite-images/satellite-image-of-globe.jpg"
+                                    <img src="{{ report.cover.url }}"
                                          alt="" class="w-100 h-100 d-block">
-                                    <figcaption
-                                            class="position-absolute text-light news-img-caption fs-3">{{ report.title }}</figcaption>
                                 </figure>
-                                <div class="wrapper-news-img-author-name position-absolute text-light d-none d-lg-inline-block">
-                                    <i class="fa-regular fa-user"></i>
-                                    <span class="author-name ps-1">{{ report.author }}</span>
+                                <div class="wrapper-text-news">
+                                    <p class="text-light news-img-caption fs-3">{{ report.title }}</p>
+                                    <div class="wrapper-news-img-author-name text-light d-none d-lg-inline-block mt-2">
+                                        <i class="fa-regular fa-user"></i>
+                                        <span class="author-name ps-1">{{ report.author }}</span>
+                                    </div>
                                 </div>
                                 <div class="card-img-overlay overlay-img-news d-flex justify-content-center align-items-center">
                                     <div class="wrapper-continue-news">
@@ -313,7 +318,8 @@
                     {% if request.method == "GET" %}
                         <div class="d-flex justify-content-center align-items-center mb-3 pagination">
                             {% if page_obj.has_next %}
-                                <a href="?page={{ page_obj.next_page_number }}" class="d-flex justify-content-center align-items-center">
+                                <a href="?page={{ page_obj.next_page_number }}"
+                                   class="d-flex justify-content-center align-items-center">
                                     <i class="fa-sharp fa-solid fa-caret-right text-light fa-xl"></i>
                                     <span style="margin-left: 2px" class="point-pagination"></span>
                                     <span style="margin-left: 2px" class="point-pagination"></span>
@@ -323,7 +329,8 @@
                                 <span class="text-black">{{ page_obj.number }}</span>
                             </span>
                             {% if page_obj.has_previous %}
-                                <a href="?page={{ page_obj.previous_page_number }}" class="d-flex justify-content-center align-items-center">
+                                <a href="?page={{ page_obj.previous_page_number }}"
+                                   class="d-flex justify-content-center align-items-center">
                                     <span style="margin-right: 2px" class="point-pagination"></span>
                                     <span style="margin-right: 2px" class="point-pagination"></span>
                                     <i class="fa-sharp fa-solid fa-caret-left text-light fa-xl"></i>

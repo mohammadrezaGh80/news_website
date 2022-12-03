@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # third party
     'crispy_forms',
     'crispy_bootstrap5',
+    'vote',
 
     # local
     'accounts',
@@ -145,3 +146,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # static config
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [str(BASE_DIR.joinpath('static'))]
+
+# media config
+MEDIA_URL = "/media/"
+MEDIA_ROOT = str(BASE_DIR.joinpath('media'))

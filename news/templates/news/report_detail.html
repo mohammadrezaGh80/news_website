@@ -98,7 +98,7 @@
             background-color: #A3DEF2;
         }
 
-        .days-ago{
+        .days-ago {
             color: rgb(204, 204, 204);
             font-size: 14px;
             width: fit-content;
@@ -114,6 +114,15 @@
             font-size: 14px;
             white-space: nowrap;
         }
+
+        .wrapper-news-detail-img {
+            width: 100%;
+            height: 650px;
+        }
+
+        .wrapper-news-detail-img > img {
+            object-fit: cover;
+        }
     </style>
 {% endblock page_style %}
 
@@ -121,12 +130,14 @@
     <section class="bg-black py-5">
         <div class="container">
             <div class="row">
+                <div class="col-10 offset-1">
+                    <figure class="wrapper-news-detail-img">
+                        <img src="{{ report.cover.url }}"
+                             class="w-100 h-100 d-block" alt="">
+                    </figure>
+                </div>
                 <div class="col-12">
                     <div class="wrapper-news-detail">
-                        <figure class="wrapper-news-detail-img">
-                            <img src="{% static 'img/dino-reichmuth-A5rCN8626Ck-unsplash-1536x1086.jpg' %}"
-                                 class="w-100 h-auto d-block" alt="">
-                        </figure>
                         <h2 style="font-family: 'Vazir-Bold',serif;font-size: 50px;"
                             class="text-white my-4 title-news-detail fs-2">{{ report.title }}</h2>
                         <ul class="info-news-detail mt-3 mb-5 d-flex flex-column flex-md-row">
@@ -188,10 +199,10 @@
                                             <p class="text-white d-flex flex-column ms-2">
                                                 <span style="font-family: 'Vazir-Bold',serif;"
                                                       class="fs-5 mb-1">{{ comment.user.username }}</span>
-                                                {% if comment.calculate_days_diff == 0 %}
+                                                {% if comment.calculate_days_diff_from_today == 0 %}
                                                     <span style="color: rgb(204, 204, 204);font-size: 13px;">امروز</span>
                                                 {% else %}
-                                                    <span class="days-ago position-relative">{{ comment.calculate_days_diff }}</span>
+                                                    <span class="days-ago position-relative">{{ comment.calculate_days_diff_from_today }}</span>
                                                 {% endif %}
                                             </p>
                                         </div>
