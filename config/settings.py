@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'vote',
+    'captcha',
 
     # local
     'accounts',
@@ -150,3 +151,7 @@ STATICFILES_DIRS = [str(BASE_DIR.joinpath('static'))]
 # media config
 MEDIA_URL = "/media/"
 MEDIA_ROOT = str(BASE_DIR.joinpath('media'))
+
+# recaptcha config
+RECAPTCHA_PUBLIC_KEY = '6LcFcVcjAAAAAG7iggdqVQbMLuWMTVjBSR7YKEUW'
+RECAPTCHA_PRIVATE_KEY = '6LcFcVcjAAAAAMqgAkSUsNVDy125Qbr2zyvQf3aN'

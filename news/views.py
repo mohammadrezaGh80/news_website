@@ -3,6 +3,7 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
+from django.contrib import messages
 
 from .models import Report
 from .forms import ReportForm, CommentForm
@@ -81,6 +82,13 @@ def report_detail_view(request, pk):
             comment.report = report
             comment.save()
             comment_form = CommentForm()
+        else:
+            error_labels = [field.label for field in comment_form for _ in field.errors]
+            if "Text" in error_labels:
+                messages.error(request, "محتوایی برای دیدگاه وجود ندارد...")
+            if "Captcha" in error_labels:
+                messages.error(request, "کپچا تیک زده نشده است...")
+
     else:
         comment_form = CommentForm()
 
