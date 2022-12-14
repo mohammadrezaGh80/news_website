@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 
-from .models import Report
+from .models import Report, Comment, CommentRelation
 from .forms import ReportForm, CommentForm
 
 
@@ -127,3 +127,23 @@ class ReportDeleteView(generic.DeleteView):
     model = Report
     template_name = "news/report_delete.html"
     success_url = reverse_lazy("report_list")
+
+
+def reply_comment_view(request, pk, comment_id):
+    report = get_object_or_404(Report, pk=pk)
+    comment = get_object_or_404(Comment, pk=comment_id)
+    if request.method == "POST":
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.user = request.user
+            new_comment.report = report
+            new_comment.save()
+            CommentRelation.objects.create(reply=new_comment, reply_to=comment)
+            return redirect("report_detail", report.id)
+    else:
+        comment_form = CommentForm()
+    return render(request, "news/reply_comment.html",
+                  context={"to_comment": comment,
+                           "report": report,
+                           "comment_form": comment_form})

@@ -29,8 +29,9 @@
                 font-size: 28px !important;
                 line-height: 1.4;
             }
-            .wrapper-news-detail-img{
-                height: 450px!important;
+
+            .wrapper-news-detail-img {
+                height: 450px !important;
             }
         }
 
@@ -44,8 +45,8 @@
                 font-size: 15px !important;
             }
 
-            .wrapper-news-detail-img{
-                height: 250px!important;
+            .wrapper-news-detail-img {
+                height: 250px !important;
             }
         }
 
@@ -71,6 +72,7 @@
             background-color: #F25600;
             color: #fff;
             font-size: 15px;
+            border: none;
         }
 
         .wrapper-comments {
@@ -131,9 +133,22 @@
             object-fit: cover;
         }
 
-        .invalid-feedback{
-            display: none!important;
+        .invalid-feedback {
+            display: none !important;
         }
+
+        .reply-button {
+            width: 65px;
+            height: 30px;
+            border-radius: 4px;
+        }
+
+        @media screen and (max-width: 576px) {
+            .reply-button {
+                margin: 5px 65px 0 0;
+            }
+        }
+
     </style>
 {% endblock page_style %}
 
@@ -200,52 +215,108 @@
                         {% endif %}
                         <ul class="comments">
                             {% for comment in comments %}
-                                <li class="comment card p-3 my-5">
-                                    <div class="top-section-comment border-bottom pb-4 border-secondary">
-                                        <div class="wrapper-info-user d-flex align-items-center">
-                                            <figure class="user-profile-img">
-                                                <img src="https://roocket.ir/img/default.png" alt=""
-                                                     class="w-100 h-auto d-block rounded-circle">
-                                            </figure>
-                                            <p class="text-white d-flex flex-column ms-2">
+                                {% if not comment.has_parent %}
+                                    <li class="comment card p-3 my-5">
+                                        <div class="top-section-comment border-bottom pb-4 border-secondary d-flex flex-sm-row justify-content-sm-between flex-column justify-content-between">
+                                            <div class="wrapper-info-user d-flex align-items-center">
+                                                <figure class="user-profile-img">
+                                                    <img src="https://roocket.ir/img/default.png" alt=""
+                                                         class="w-100 h-auto d-block rounded-circle">
+                                                </figure>
+                                                <p class="text-white d-flex flex-column ms-2">
                                                 <span style="font-family: 'Vazir-Bold',serif;"
-                                                      class="fs-5 mb-1">{{ comment.user.username }}</span>
-                                                {% if comment.calculate_days_diff_from_today == 0 %}
-                                                    <span style="color: rgb(204, 204, 204);font-size: 13px;">امروز</span>
-                                                {% else %}
-                                                    <span class="days-ago position-relative">{{ comment.calculate_days_diff_from_today }}</span>
-                                                {% endif %}
-                                            </p>
+                                                      class="fs-5 mb-1">
+                                                    {{ comment.user.username }}
+                                                </span>
+                                                    {% if comment.calculate_days_diff_from_today == 0 %}
+                                                        <span style="color: rgb(204, 204, 204);font-size: 13px;">امروز</span>
+                                                    {% else %}
+                                                        <span class="days-ago position-relative">{{ comment.calculate_days_diff_from_today }}</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <a href="{% url 'reply_comment' report.id comment.id %}"
+                                                   class="reply-button text-white border border-secondary d-flex align-items-center justify-content-center">
+                                                    <i class="fa-solid fa-reply fa-sm"></i>
+                                                    <span style="font-size: 13px;margin-right: 6px">پاسخ</span>
+                                                </a>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="bottom-section-comment">
-                                        <p class="text-comment mt-3 text-white">{{ comment.text|linebreaksbr }}</p>
-                                    </div>
-                                </li>
+                                        <div class="bottom-section-comment">
+                                            <p class="text-comment mt-3 text-white">{{ comment.text|linebreaksbr }}</p>
+                                            {% if comment.replies.count >= 1 %}
+                                                <div class="d-flex justify-content-end mt-3">
+                                                    <button style="font-size: 14px;background-color: #061B33;" class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                                            data-bs-target="#{{ comment.user }}{{ comment.id }}">
+                                                        مشاهده پاسخ ها ({{ comment.count_of_children }})
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                {% endif %}
+                                <ul class="comments ms-5 collapse" id="{{ comment.user }}{{ comment.id }}">
+                                    {% for comment_reply in comment.get_all_replies %}
+                                        <li class="comment card p-3 mb-5">
+                                            <div class="top-section-comment border-bottom pb-4 border-secondary d-flex flex-sm-row justify-content-sm-between flex-column justify-content-between">
+                                                <div class="wrapper-info-user d-flex align-items-center">
+                                                    <figure class="user-profile-img">
+                                                        <img src="https://roocket.ir/img/default.png" alt=""
+                                                             class="w-100 h-auto d-block rounded-circle">
+                                                    </figure>
+                                                    <p class="text-white d-flex flex-column ms-2">
+                                                        <span style="font-family: 'Vazir-Bold',serif;direction: ltr;"
+                                                              class="fs-5 mb-1 d-flex align-items-center">
+                                                            {% if comment_reply.reply_to.has_parent %}
+                                                                <span class="ms-2 text-secondary" style="font-size: 16px">@{{ comment_reply.reply_to.user }}</span>
+                                                            {% endif %}
+                                                            {{ comment_reply.reply.user.username }}
+                                                        </span>
+                                                        {% if comment_reply.reply.calculate_days_diff_from_today == 0 %}
+                                                            <span style="color: rgb(204, 204, 204);font-size: 13px;">امروز</span>
+                                                        {% else %}
+                                                            <span class="days-ago position-relative">{{ comment_reply.reply.calculate_days_diff_from_today }}</span>
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <a href="{% url 'reply_comment' report.id comment_reply.reply.id %}"
+                                                       class="reply-button text-white border border-secondary d-flex align-items-center justify-content-center">
+                                                        <i class="fa-solid fa-reply fa-sm"></i>
+                                                        <span style="font-size: 13px;margin-right: 6px">پاسخ</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="bottom-section-comment">
+                                                <p class="text-comment mt-3 text-white">{{ comment_reply.reply.text|linebreaksbr }}</p>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
                             {% endfor %}
                         </ul>
                     </div>
-                    {% if user.is_authenticated %}
-                        <div class="send-comment border border-secondary p-3">
-                            <h3 style="font-family: 'Vazir-Bold', serif;" class="text-white">دیدگاهتان را بنویسید</h3>
-                            <p class="my-3 text-form">بخش‌های موردنیاز علامت‌گذاری شده‌اند *</p>
-                            <form action="" method="POST" class="d-flex flex-column">
-                                {% csrf_token %}
-                                {{ comment_form|crispy }}
-                                {% if messages %}
-                                    <ul class="messages">
-                                        {% for message in messages %}
-                                            <li class="alert alert-danger">{{ message }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                                <button type="submit" class="mt-3 button-input">فرستادن دیدگاه</button>
-                            </form>
-                        </div>
-                    {% endif %}
                 </div>
             </div>
-        </div>
+            {% if user.is_authenticated %}
+                <div class="send-comment border border-secondary p-3">
+                    <h3 style="font-family: 'Vazir-Bold', serif;" class="text-white">دیدگاهتان را بنویسید</h3>
+                    <p class="my-3 text-form">بخش‌های موردنیاز علامت‌گذاری شده‌اند *</p>
+                    <form action="" method="POST" class="d-flex flex-column">
+                        {% csrf_token %}
+                        {{ comment_form|crispy }}
+                        {% if messages %}
+                            <ul class="messages">
+                                {% for message in messages %}
+                                    <li class="alert alert-danger">{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <button type="submit" class="mt-3 button-input">فرستادن دیدگاه</button>
+                    </form>
+                </div>
+            {% endif %}
     </section>
 
     <button class="scroll-to-top position-fixed border-0 rounded" onclick="scrollToTop()">

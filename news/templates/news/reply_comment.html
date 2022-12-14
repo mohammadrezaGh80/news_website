@@ -1,0 +1,54 @@
+{% extends "_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}پاسخ به دیدگاه{% endblock page_title %}
+
+{% block page_style %}
+    <style>
+        form label{
+            color: rgb(211, 211, 211);
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        form textarea {
+            width: min(600px, 100%) !important;
+            background-color: rgb(222, 222, 222) !important;
+        }
+        .button-input {
+            width: 120px;
+            height: 40px;
+            background-color: #F25600;
+            color: #fff;
+            font-size: 15px;
+            border: none;
+        }
+    </style>
+{% endblock page_style %}
+
+{% block page_content %}
+    <section style="background-color: #25272B;" class="py-5 flex-grow-1">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="text-white">{{ report.title }}</h3>
+                    <h2 class="text-white">{{ to_comment.user }}</h2>
+                    <h4 class="text-white">{{ to_comment.text }}</h4>
+                    <div class="border border-secondary p-3">
+                        <form action="" method="POST" class="d-flex flex-column">
+                        {% csrf_token %}
+                        {{ comment_form|crispy }}
+                        {% if messages %}
+                            <ul class="messages">
+                                {% for message in messages %}
+                                    <li class="alert alert-danger">{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <button type="submit" class="mt-3 button-input">فرستادن دیدگاه</button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock page_content %}
