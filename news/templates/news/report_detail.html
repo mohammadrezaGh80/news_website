@@ -137,15 +137,29 @@
             display: none !important;
         }
 
-        .reply-button {
+        .reply-button,
+        .edit-button {
             width: 65px;
-            height: 30px;
+            height: 32px;
             border-radius: 4px;
         }
 
+        .edit-button {
+            width: 72px !important;
+        }
+
         @media screen and (max-width: 576px) {
-            .reply-button {
-                margin: 5px 65px 0 0;
+            .username-comment{
+                font-size: 18px!important;
+            }
+
+            .user-profile-img {
+                width: 50px;
+                height: 50px;
+            }
+
+            ul.comments > ul.comments{
+                margin-right: 25px!important;
             }
         }
 
@@ -225,7 +239,7 @@
                                                 </figure>
                                                 <p class="text-white d-flex flex-column ms-2">
                                                 <span style="font-family: 'Vazir-Bold',serif;"
-                                                      class="fs-5 mb-1">
+                                                      class="fs-5 mb-1 username-comment">
                                                     {{ comment.user.username }}
                                                 </span>
                                                     {% if comment.calculate_days_diff_from_today == 0 %}
@@ -235,9 +249,14 @@
                                                     {% endif %}
                                                 </p>
                                             </div>
-                                            <div>
+                                            <div class="d-flex align-items-start mt-3 mt-md-0">
+                                                <a href="{% url 'edit_comment' report.id comment.id %}"
+                                                   class="edit-button text-white border border-secondary d-flex align-items-center justify-content-center">
+                                                    <i class="fa-solid fa-edit fa-sm"></i>
+                                                    <span style="font-size: 13px;margin-right: 6px">ویرایش</span>
+                                                </a>
                                                 <a href="{% url 'reply_comment' report.id comment.id %}"
-                                                   class="reply-button text-white border border-secondary d-flex align-items-center justify-content-center">
+                                                   class="reply-button text-white border border-secondary d-flex align-items-center justify-content-center ms-2">
                                                     <i class="fa-solid fa-reply fa-sm"></i>
                                                     <span style="font-size: 13px;margin-right: 6px">پاسخ</span>
                                                 </a>
@@ -247,7 +266,9 @@
                                             <p class="text-comment mt-3 text-white">{{ comment.text|linebreaksbr }}</p>
                                             {% if comment.replies.count >= 1 %}
                                                 <div class="d-flex justify-content-end mt-3">
-                                                    <button style="font-size: 14px;background-color: #061B33;" class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                                    <button style="font-size: 14px;background-color: #061B33;"
+                                                            class="btn btn-primary" type="button"
+                                                            data-bs-toggle="collapse"
                                                             data-bs-target="#{{ comment.user }}{{ comment.id }}">
                                                         مشاهده پاسخ ها ({{ comment.count_of_children }})
                                                     </button>
@@ -267,11 +288,12 @@
                                                     </figure>
                                                     <p class="text-white d-flex flex-column ms-2">
                                                         <span style="font-family: 'Vazir-Bold',serif;direction: ltr;"
-                                                              class="fs-5 mb-1 d-flex align-items-center">
+                                                              class="mb-1 d-flex align-items-md-center flex-md-row flex-column align-items-end">
                                                             {% if comment_reply.reply_to.has_parent %}
-                                                                <span class="ms-2 text-secondary" style="font-size: 16px">@{{ comment_reply.reply_to.user }}</span>
+                                                                <span class="ms-0 ms-md-2 text-secondary order-1 order-md-0"
+                                                                      style="font-size: 16px">@{{ comment_reply.reply_to.user }}</span>
                                                             {% endif %}
-                                                            {{ comment_reply.reply.user.username }}
+                                                            <span class="username-comment fs-5">{{ comment_reply.reply.user.username }}</span>
                                                         </span>
                                                         {% if comment_reply.reply.calculate_days_diff_from_today == 0 %}
                                                             <span style="color: rgb(204, 204, 204);font-size: 13px;">امروز</span>
@@ -280,9 +302,14 @@
                                                         {% endif %}
                                                     </p>
                                                 </div>
-                                                <div>
+                                                <div class="d-flex align-items-start mt-3 mt-sm-0">
+                                                    <a href="{% url 'edit_comment' report.id comment_reply.reply.id %}"
+                                                       class="edit-button text-white border border-secondary d-flex align-items-center justify-content-center">
+                                                        <i class="fa-solid fa-edit fa-sm"></i>
+                                                        <span style="font-size: 13px;margin-right: 6px">ویرایش</span>
+                                                    </a>
                                                     <a href="{% url 'reply_comment' report.id comment_reply.reply.id %}"
-                                                       class="reply-button text-white border border-secondary d-flex align-items-center justify-content-center">
+                                                       class="reply-button text-white border border-secondary d-flex align-items-center justify-content-center ms-2">
                                                         <i class="fa-solid fa-reply fa-sm"></i>
                                                         <span style="font-size: 13px;margin-right: 6px">پاسخ</span>
                                                     </a>

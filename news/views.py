@@ -147,3 +147,17 @@ def reply_comment_view(request, pk, comment_id):
                   context={"to_comment": comment,
                            "report": report,
                            "comment_form": comment_form})
+
+
+def comment_update_view(request, pk, comment_id):
+    report = get_object_or_404(Report, pk=pk)
+    comment = get_object_or_404(Comment, pk=comment_id)
+    comment_form = CommentForm(request.POST or None, instance=comment)
+    if comment_form.is_valid():
+        comment_form.save()
+        return redirect("report_detail", report.id)
+
+    return render(request, "news/reply_comment.html",
+                  context={"to_comment": comment,
+                           "report": report,
+                           "comment_form": comment_form})
