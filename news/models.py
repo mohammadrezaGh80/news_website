@@ -16,6 +16,9 @@ class Report(models.Model):
     def __str__(self):
         return self.title
 
+    def calculate_days_diff_from_today(self):
+        return abs((self.datetime_modified.date() - date.today()).days)
+
     def get_absolute_url(self):
         return reverse("report_detail", args=[self.id])
 
@@ -26,9 +29,10 @@ class Comment(models.Model):
     text = models.TextField()
 
     datetime_created = models.DateTimeField(auto_now_add=True)
+    datetime_modified = models.DateTimeField(auto_now=True)
 
     def calculate_days_diff_from_today(self):
-        return abs((self.datetime_created.date() - date.today()).days)
+        return abs((self.datetime_modified.date() - date.today()).days)
 
     def get_all_id_of_children(self):
         all_id_list = []
@@ -53,6 +57,11 @@ class Comment(models.Model):
 
     def has_parent(self):
         return self.to_comment.count()
+
+    def get_root_comment(self):
+        if self.has_parent():
+            return self.to_comment.first().reply_to.get_root_comment()
+        return self
 
     def __str__(self):
         return self.text

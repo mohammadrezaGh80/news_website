@@ -79,7 +79,7 @@
                                 <span style="font-size: 18px" class="ps-2">بازگشت به صفحه خبر</span>
                             </a>
                         </p>
-                        {% if user.is_authenticated and request.user == report.author or user.is_superuser %}
+                        {% if user.is_authenticated and user == report.author or user.is_superuser %}
                             <div style="background-color: #eeeeee" class="col-12 card shadow mt-3 border-0 py-3 px-4">
                                 <form action="" method="POST" enctype="multipart/form-data">
                                     {% csrf_token %}

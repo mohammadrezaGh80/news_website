@@ -107,21 +107,14 @@
             background-color: #A3DEF2;
         }
 
-        .days-ago {
+        .text-number {
             color: rgb(204, 204, 204);
             font-size: 14px;
-            width: fit-content;
         }
 
-        .days-ago::after {
-            content: "روز پیش";
-            position: absolute;
-            left: -50px;
-            top: -3px;
-            color: rgb(204, 204, 204);
-            display: inline-block;
-            font-size: 14px;
-            white-space: nowrap;
+        .text-number > span:last-child {
+            position: relative;
+            top: -2px;
         }
 
         .wrapper-news-detail-img {
@@ -149,17 +142,17 @@
         }
 
         @media screen and (max-width: 576px) {
-            .username-comment{
-                font-size: 18px!important;
+            .username-comment {
+                font-size: 18px !important;
             }
 
             .user-profile-img {
-                width: 50px;
-                height: 50px;
+                width: 50px !important;
+                height: 50px !important;
             }
 
-            ul.comments > ul.comments{
-                margin-right: 25px!important;
+            ul.comments > ul.comments {
+                margin-right: 25px !important;
             }
         }
 
@@ -179,7 +172,7 @@
                 <div class="col-12">
                     <div class="wrapper-news-detail">
                         <h2 style="font-family: 'Vazir-Bold',serif;font-size: 50px;"
-                            class="text-white my-4 title-news-detail fs-2">{{ report.title }}</h2>
+                            class="text-white my-4 title-news-detail text-center text-sm-start fs-2">{{ report.title }}</h2>
                         <ul class="info-news-detail mt-3 mb-5 d-flex flex-column flex-md-row">
                             <li class="text-white mt-3 mt-md-0 me-md-3">
                                 <i class="fa-regular fa-user fa-lg"></i>
@@ -245,22 +238,29 @@
                                                     {% if comment.calculate_days_diff_from_today == 0 %}
                                                         <span style="color: rgb(204, 204, 204);font-size: 13px;">امروز</span>
                                                     {% else %}
-                                                        <span class="days-ago position-relative">{{ comment.calculate_days_diff_from_today }}</span>
+                                                        <span class="text-number">
+                                                            <span>{{ comment.calculate_days_diff_from_today }}</span>
+                                                            <span>روز پیش</span>
+                                                        </span>
                                                     {% endif %}
                                                 </p>
                                             </div>
-                                            <div class="d-flex align-items-start mt-3 mt-md-0">
-                                                <a href="{% url 'edit_comment' report.id comment.id %}"
-                                                   class="edit-button text-white border border-secondary d-flex align-items-center justify-content-center">
-                                                    <i class="fa-solid fa-edit fa-sm"></i>
-                                                    <span style="font-size: 13px;margin-right: 6px">ویرایش</span>
-                                                </a>
-                                                <a href="{% url 'reply_comment' report.id comment.id %}"
-                                                   class="reply-button text-white border border-secondary d-flex align-items-center justify-content-center ms-2">
-                                                    <i class="fa-solid fa-reply fa-sm"></i>
-                                                    <span style="font-size: 13px;margin-right: 6px">پاسخ</span>
-                                                </a>
-                                            </div>
+                                            {% if user.is_authenticated %}
+                                                <div class="d-flex align-items-start mt-3 mt-md-0">
+                                                    {% if user == comment.user %}
+                                                        <a href="{% url 'edit_comment' report.id comment.id %}"
+                                                           class="edit-button text-white border border-secondary d-flex align-items-center justify-content-center">
+                                                            <i class="fa-solid fa-edit fa-sm"></i>
+                                                            <span style="font-size: 13px;margin-right: 6px">ویرایش</span>
+                                                        </a>
+                                                    {% endif %}
+                                                    <a href="{% url 'reply_comment' report.id comment.id %}"
+                                                       class="reply-button text-white border border-secondary d-flex align-items-center justify-content-center ms-2">
+                                                        <i class="fa-solid fa-reply fa-sm"></i>
+                                                        <span style="font-size: 13px;margin-right: 6px">پاسخ</span>
+                                                    </a>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                         <div class="bottom-section-comment">
                                             <p class="text-comment mt-3 text-white">{{ comment.text|linebreaksbr }}</p>
@@ -298,22 +298,29 @@
                                                         {% if comment_reply.reply.calculate_days_diff_from_today == 0 %}
                                                             <span style="color: rgb(204, 204, 204);font-size: 13px;">امروز</span>
                                                         {% else %}
-                                                            <span class="days-ago position-relative">{{ comment_reply.reply.calculate_days_diff_from_today }}</span>
+                                                            <span class="text-number">
+                                                                <span>{{ comment_reply.reply.calculate_days_diff_from_today }}</span>
+                                                                <span>روز پیش</span>
+                                                            </span>
                                                         {% endif %}
                                                     </p>
                                                 </div>
-                                                <div class="d-flex align-items-start mt-3 mt-sm-0">
-                                                    <a href="{% url 'edit_comment' report.id comment_reply.reply.id %}"
-                                                       class="edit-button text-white border border-secondary d-flex align-items-center justify-content-center">
-                                                        <i class="fa-solid fa-edit fa-sm"></i>
-                                                        <span style="font-size: 13px;margin-right: 6px">ویرایش</span>
-                                                    </a>
-                                                    <a href="{% url 'reply_comment' report.id comment_reply.reply.id %}"
-                                                       class="reply-button text-white border border-secondary d-flex align-items-center justify-content-center ms-2">
-                                                        <i class="fa-solid fa-reply fa-sm"></i>
-                                                        <span style="font-size: 13px;margin-right: 6px">پاسخ</span>
-                                                    </a>
-                                                </div>
+                                                {% if user.is_authenticated %}
+                                                    <div class="d-flex align-items-start mt-3 mt-sm-0">
+                                                        {% if user == comment_reply.reply.user %}
+                                                            <a href="{% url 'edit_comment' report.id comment_reply.reply.id %}"
+                                                               class="edit-button text-white border border-secondary d-flex align-items-center justify-content-center">
+                                                                <i class="fa-solid fa-edit fa-sm"></i>
+                                                                <span style="font-size: 13px;margin-right: 6px">ویرایش</span>
+                                                            </a>
+                                                        {% endif %}
+                                                        <a href="{% url 'reply_comment' report.id comment_reply.reply.id %}"
+                                                           class="reply-button text-white border border-secondary d-flex align-items-center justify-content-center ms-2">
+                                                            <i class="fa-solid fa-reply fa-sm"></i>
+                                                            <span style="font-size: 13px;margin-right: 6px">پاسخ</span>
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                             <div class="bottom-section-comment">
                                                 <p class="text-comment mt-3 text-white">{{ comment_reply.reply.text|linebreaksbr }}</p>
