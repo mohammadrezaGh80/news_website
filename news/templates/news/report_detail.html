@@ -156,6 +156,20 @@
             }
         }
 
+        .wrapper-like, .wrapper-dislike {
+            height: 25px;
+        }
+
+        .wrapper-like .btn,
+        .wrapper-dislike .btn {
+            --bs-btn-border-color: initial !important;
+            padding: 8px!important;
+        }
+
+         .wrapper-like .btn > i,
+        .wrapper-dislike .btn > i{
+            color: #5f5f5f;
+         }
     </style>
 {% endblock page_style %}
 
@@ -264,17 +278,41 @@
                                         </div>
                                         <div class="bottom-section-comment">
                                             <p class="text-comment mt-3 text-white">{{ comment.text|linebreaksbr }}</p>
-                                            {% if comment.replies.count >= 1 %}
-                                                <div class="d-flex justify-content-end mt-3">
-                                                    <button style="font-size: 14px;background-color: #061B33;"
-                                                            class="btn btn-primary" type="button"
-                                                            data-bs-toggle="collapse"
-                                                            data-bs-target="#{{ comment.user }}{{ comment.id }}">
-                                                        مشاهده پاسخ ها ({{ comment.count_of_children }})
-                                                    </button>
+                                            <div class="wrapper-like-dislike text-white d-flex justify-content-end align-items-center">
+                                                <div class="wrapper-dislike d-flex align-items-center">
+                                                    <span>{{ comment.dislikes }}</span>
+                                                    <form method="post"
+                                                          action="{% url "dislike_comment" report.id comment.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn dislike-icon"
+                                                                data-id="{{ comment.id }}">
+                                                            <i class="fa-regular fa-thumbs-down fa-lg {% if comment.id in list_id_dislike_comment %}text-danger{% endif %}"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
-                                            {% endif %}
+                                                <div class="wrapper-like ms-4 d-flex align-items-center">
+                                                    <span>{{ comment.likes }}</span>
+                                                    <form method="post"
+                                                          action="{% url "like_comment" report.id comment.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn like-icon"
+                                                                data-id="{{ comment.id }}">
+                                                            <i class="fa-regular fa-thumbs-up fa-lg {% if comment.id in list_id_like_comment %}text-white{% endif %}"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
                                         </div>
+                                        {% if comment.replies.count >= 1 %}
+                                            <div class="d-flex justify-content-end mt-3">
+                                                <button style="font-size: 14px;background-color: #061B33;"
+                                                        class="btn btn-primary" type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#{{ comment.user }}{{ comment.id }}">
+                                                    مشاهده پاسخ ها ({{ comment.count_of_children }})
+                                                </button>
+                                            </div>
+                                        {% endif %}
                                     </li>
                                 {% endif %}
                                 <ul class="comments ms-5 collapse" id="{{ comment.user }}{{ comment.id }}">
@@ -324,6 +362,30 @@
                                             </div>
                                             <div class="bottom-section-comment">
                                                 <p class="text-comment mt-3 text-white">{{ comment_reply.reply.text|linebreaksbr }}</p>
+                                                <div class="wrapper-like-dislike text-white d-flex justify-content-end align-items-center">
+                                                    <div class="wrapper-dislike d-flex align-items-center">
+                                                        <span>{{ comment_reply.reply.dislikes }}</span>
+                                                        <form method="post"
+                                                              action="{% url "dislike_comment" report.id comment_reply.reply.id %}">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn dislike-icon"
+                                                                    data-id="{{ comment_reply.reply.id }}">
+                                                                <i class="fa-regular fa-thumbs-down fa-lg {% if comment_reply.reply.id in list_id_dislike_comment %}text-danger{% endif %}"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                    <div class="wrapper-like d-flex align-items-center ms-4">
+                                                        <span>{{ comment_reply.reply.likes }}</span>
+                                                        <form method="post"
+                                                              action="{% url "like_comment" report.id comment_reply.reply.id %}">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn like-icon"
+                                                                    data-id="{{ comment_reply.reply.id }}">
+                                                                <i class="fa-regular fa-thumbs-up fa-lg {% if comment_reply.reply.id in list_id_like_comment %}text-white{% endif %}"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </li>
                                     {% endfor %}
@@ -363,6 +425,52 @@
     <script>
         function scrollToTop() {
             window.scrollTo(0, 0);
+        }
+
+        const listLikeIconBtn = document.getElementsByClassName("like-icon");
+        for (let likeIconBtn of listLikeIconBtn) {
+            likeIconBtn.addEventListener("click", function (event) {
+                event.preventDefault();
+                const countLikes = +this.closest("div.wrapper-like").firstElementChild.innerHTML
+                const commentId = likeIconBtn.getAttribute("data-id");
+                let formData = new FormData();
+                formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+                axios.post(`like/${commentId}/`, formData)
+                    .then(res => {
+                        this.closest("div.wrapper-like").firstElementChild.innerHTML = `${res.data.likes}`
+                        if (res.data.likes === countLikes + 1){
+                            this.firstElementChild.classList.add("text-white");
+                        }else{
+                            this.firstElementChild.classList.remove("text-white");
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            })
+        }
+
+        const listDislikeIconBtn = document.getElementsByClassName("dislike-icon");
+        for (let dislikeIconBtn of listDislikeIconBtn) {
+            dislikeIconBtn.addEventListener("click", function (event) {
+                event.preventDefault();
+                const countDislikes = +this.closest("div.wrapper-dislike").firstElementChild.innerHTML
+                const commentId = dislikeIconBtn.getAttribute("data-id");
+                let formData = new FormData();
+                formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+                axios.post(`dislike/${commentId}/`, formData)
+                    .then(res => {
+                        this.closest("div.wrapper-dislike").firstElementChild.innerHTML = `${res.data.dislikes}`;
+                        if (res.data.dislikes === countDislikes + 1){
+                            this.firstElementChild.classList.add("text-danger");
+                        }else{
+                            this.firstElementChild.classList.remove("text-danger");
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            })
         }
     </script>
 {% endblock page_script %}

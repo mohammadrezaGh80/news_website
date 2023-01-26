@@ -6,8 +6,9 @@ from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
 
-from .models import Report, Comment, CommentRelation
+from .models import Report, Comment, CommentRelation, UserLikeComment, UserDislikeComment
 from .forms import ReportForm, CommentForm
 
 
@@ -50,7 +51,15 @@ class ReportListView(generic.ListView):
 
 
 def report_detail_view(request, pk):
+    list_id_like_comment = list()
+    list_id_dislike_comment = list()
     report = get_object_or_404(Report, pk=pk)
+    if request.user.is_authenticated:
+        list_user_like_comments = UserLikeComment.objects.filter(user=request.user, comment__report=report)
+        list_user_dislike_comments = UserDislikeComment.objects.filter(user=request.user, comment__report=report)
+        list_id_like_comment = [user_like_comment.comment.pk for user_like_comment in list_user_like_comments]
+        list_id_dislike_comment = [user_dislike_comment.comment.pk
+                                   for user_dislike_comment in list_user_dislike_comments]
     if request.method == "POST":
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
@@ -72,7 +81,9 @@ def report_detail_view(request, pk):
     return render(request, "news/report_detail.html",
                   context={"report": report,
                            "comment_form": comment_form,
-                           "comments": report.comments.order_by("-datetime_created")})
+                           "comments": report.comments.order_by("-datetime_created"),
+                           "list_id_like_comment": list_id_like_comment,
+                           "list_id_dislike_comment": list_id_dislike_comment,})
 
 
 def report_create_view(request):
@@ -139,3 +150,39 @@ def comment_update_view(request, pk, comment_id):
                                "comment_form": comment_form})
     else:
         raise PermissionDenied()
+
+
+@login_required
+def comment_like_view(request, pk, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    if request.method == "POST":
+        try:
+            user_like_comment = UserLikeComment.objects.get(user=request.user, comment=comment)
+        except UserLikeComment.DoesNotExist:
+            comment.likes += 1
+            comment.save()
+            UserLikeComment.objects.create(user=request.user, comment=comment)
+        else:
+            user_like_comment.delete()
+            comment.likes -= 1
+            comment.save()
+
+        return JsonResponse({"likes": comment.likes})
+
+
+@login_required
+def comment_dislike_view(request, pk, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    if request.method == "POST":
+        try:
+            user_dislike_comment = UserDislikeComment.objects.get(user=request.user, comment=comment)
+        except UserDislikeComment.DoesNotExist:
+            comment.dislikes += 1
+            comment.save()
+            UserDislikeComment.objects.create(user=request.user, comment=comment)
+        else:
+            user_dislike_comment.delete()
+            comment.dislikes -= 1
+            comment.save()
+
+        return JsonResponse({"dislikes": comment.dislikes})

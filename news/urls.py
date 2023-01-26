@@ -10,4 +10,6 @@ urlpatterns = [
     path('<int:pk>/delete/', views.ReportDeleteView.as_view(), name="report_delete"),
     path('<int:pk>/reply/<int:comment_id>/', views.reply_comment_view, name="reply_comment"),
     path('<int:pk>/update/<int:comment_id>/', views.comment_update_view, name="edit_comment"),
+    path('<int:pk>/like/<int:comment_id>/', views.comment_like_view, name="like_comment"),
+    path('<int:pk>/dislike/<int:comment_id>/', views.comment_dislike_view, name="dislike_comment"),
 ]

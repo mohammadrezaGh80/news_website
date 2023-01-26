@@ -27,6 +27,8 @@ class Comment(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="comments")
     report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name="comments")
     text = models.TextField()
+    likes = models.PositiveIntegerField(default=0)
+    dislikes = models.PositiveIntegerField(default=0)
 
     datetime_created = models.DateTimeField(auto_now_add=True)
     datetime_modified = models.DateTimeField(auto_now=True)
@@ -73,3 +75,19 @@ class CommentRelation(models.Model):
 
     def __str__(self):
         return f"{self.reply.text} to {self.reply_to.text}"
+
+
+class UserLikeComment(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="comments_like")
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="users_like")
+
+    def __str__(self):
+        return f"{self.user.username} likes {self.comment.text}"
+
+
+class UserDislikeComment(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="comments_dislike")
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="users_dislike")
+
+    def __str__(self):
+        return f"{self.user.username} dislikes {self.comment.text}"
