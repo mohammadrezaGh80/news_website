@@ -31,7 +31,7 @@ class Comment(models.Model):
     dislikes = models.PositiveIntegerField(default=0)
 
     datetime_created = models.DateTimeField(auto_now_add=True)
-    datetime_modified = models.DateTimeField(auto_now=True)
+    datetime_modified = models.DateTimeField()
 
     def calculate_days_diff_from_today(self):
         return abs((self.datetime_modified.date() - date.today()).days)

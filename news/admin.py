@@ -10,7 +10,7 @@ class ReportAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "report", "likes", "dislikes", "datetime_created",)
+    list_display = ("id", "user", "report", "likes", "dislikes", "datetime_created", "datetime_modified", )
 
 
 @admin.register(CommentRelation)

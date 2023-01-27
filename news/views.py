@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 
+from datetime import datetime
+
 from .models import Report, Comment, CommentRelation, UserLikeComment, UserDislikeComment
 from .forms import ReportForm, CommentForm
 
@@ -66,6 +68,7 @@ def report_detail_view(request, pk):
             comment = comment_form.save(commit=False)
             comment.user = request.user
             comment.report = report
+            comment.datetime_modified = datetime.now()
             comment.save()
             comment_form = CommentForm()
         else:
@@ -141,7 +144,9 @@ def comment_update_view(request, pk, comment_id):
     if comment.user == request.user:
         comment_form = CommentForm(request.POST or None, instance=comment)
         if comment_form.is_valid():
-            comment_form.save()
+            comment = comment_form.save(commit=False)
+            comment.datetime_modified = datetime.now()
+            comment.save()
             return redirect("report_detail", report.id)
 
         return render(request, "news/reply_comment.html",
