@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 {% load static %}
 
-{% block page_title %}لیست خبر ها{% endblock page_title %}
+{% block page_title %}لیست خبر های در انتظار{% endblock page_title %}
 
 {% block page_style %}
     <style>
@@ -31,7 +31,7 @@
             right: 30px;
         }
 
-        .news-img-caption{
+        .news-img-caption {
             line-height: 1.4;
         }
 
@@ -164,16 +164,8 @@
     <section style="background-color: #25272B;" class="py-5 flex-grow-1">
         <div class="container">
             <div class="row">
-                <div class="col-lg-3 col-12">
-                    {% if is_superuser %}
-                        <a href="{% url "report_pending_list" %}" class="wrapper-pending-reports p-3 d-flex justify-content-center" style="background-color: #202125;">
-                            <div class="text-white d-flex flex-column align-items-center">
-                                <i class="far fa-folder-open fs-4 mb-2"></i>
-                                <span>پیامهای در انتظار بررسی</span>
-                            </div>
-                        </a>
-                    {% endif %}
-                    <div class="wrapper-search-box p-3 {% if is_superuser %}mt-3{% endif %}" style="background-color: #202125;">
+                <div class="col-12 col-lg-3">
+                    <div class="wrapper-search-box p-3" style="background-color: #202125;">
                         <form action="" method="POST">
                             {% csrf_token %}
                             <div class="input-group my-3">
@@ -275,6 +267,13 @@
                     </div>
                 </div>
                 <div class="col-lg-7 offset-lg-1 offset-0 col-12 d-flex flex-column mt-5 mt-lg-0">
+                    <p style="direction: rtl" class="d-flex align-items-center mb-3">
+                        <a style="color: #f3f3f3;" href="{% url 'report_list' %}"
+                           class="wrapper-icon text-decoration-none">
+                            <i class="fa-solid fa-arrow-right fa-lg"></i>
+                            <span style="font-size: 18px" class="ps-2">بازگشت به صفحه اخبار</span>
+                        </a>
+                    </p>
                     {% if request.method == "POST" %}
                         {% if is_all_blank %}
                             <div class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row">
@@ -294,7 +293,7 @@
                             </div>
                         {% endif %}
                     {% endif %}
-                    {% for report in reports %}
+                    {% for report in reports_pending %}
                         <div class="mb-5">
                             <div class="d-flex position-relative wrapper-news overflow-hidden">
                                 <div
@@ -314,7 +313,7 @@
                                 </div>
                                 <div class="card-img-overlay overlay-img-news d-flex justify-content-center align-items-center">
                                     <div class="wrapper-continue-news">
-                                        <a href="{{ report.get_absolute_url }}"
+                                        <a href="{% url "report_pending_detail" report.id %}"
                                            class="text-light px-3 py-2 fs-5 position-relative">
                                         <span>
                                             <i class="fst-normal">ادامه مطلب</i>

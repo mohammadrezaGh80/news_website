@@ -8,5 +8,5 @@ class HomePageView(generic.ListView):
     context_object_name = "last_news"
 
     def get_queryset(self):
-        return Report.objects.order_by("-datetime_modified")[:3]
+        return Report.objects.filter(status=Report.PUBLISHED).order_by("-datetime_modified")[:3]
 

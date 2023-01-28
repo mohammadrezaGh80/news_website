@@ -12,4 +12,6 @@ urlpatterns = [
     path('<int:pk>/update/<int:comment_id>/', views.comment_update_view, name="edit_comment"),
     path('<int:pk>/like/<int:comment_id>/', views.comment_like_view, name="like_comment"),
     path('<int:pk>/dislike/<int:comment_id>/', views.comment_dislike_view, name="dislike_comment"),
+    path('pending/', views.ReportPendingListView.as_view(), name="report_pending_list"),
+    path('pending/<int:pk>/', views.ReportPendingDetailView.as_view(), name="report_pending_detail"),
 ]

@@ -5,10 +5,20 @@ from datetime import date
 
 
 class Report(models.Model):
+    PENDING = "pending"
+    PUBLISHED = "published"
+    CANCELED = "canceled"
+    STATUS_CHOICES = (
+        (PENDING, "Pending"),
+        (PUBLISHED, "Published"),
+        (CANCELED, "Canceled"),
+    )
+
     title = models.CharField(max_length=250)
     description = models.TextField()
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="reports")
     cover = models.ImageField(upload_to="covers/", blank=True)
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES, default=PENDING)
 
     datetime_created = models.DateTimeField(auto_now_add=True)
     datetime_modified = models.DateTimeField(auto_now=True)

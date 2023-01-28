@@ -5,7 +5,7 @@ from .models import Report, Comment, CommentRelation, UserLikeComment, UserDisli
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ("title", "author", "datetime_created", "datetime_modified",)
+    list_display = ("title", "author", "status", "datetime_created", "datetime_modified",)
 
 
 @admin.register(Comment)

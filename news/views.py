@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 
@@ -15,18 +16,21 @@ from .forms import ReportForm, CommentForm
 
 
 class ReportListView(generic.ListView):
-    is_all_blank = False
-    is_exist = True
     template_name = "news/report_list.html"
     context_object_name = "reports"
-    extra_context = {"is_all_blank": is_all_blank,
-                     "is_exist": is_exist}
     paginate_by = 4
 
     def get_queryset(self):
-        return Report.objects.order_by("-datetime_modified")
+        return Report.objects.filter(status=Report.PUBLISHED).order_by("-datetime_modified")
+
+    def get_context_data(self, **kwargs):
+        context = super(ReportListView, self).get_context_data(**kwargs)
+        context["is_superuser"] = bool(self.request.user in get_user_model().objects.filter(is_superuser=True))
+        return context
 
     def post(self, request, *args, **kwargs):
+        is_all_blank = False
+        is_exist = True
         authors = get_user_model().objects.filter(
             username__contains=request.POST["search"]
         ) if "author-input" in request.POST else ''
@@ -36,9 +40,9 @@ class ReportListView(generic.ListView):
         ) if "title-input" in request.POST else ''
 
         if titles == '' and authors == '':
-            self.is_all_blank = True
+            is_all_blank = True
         elif not (titles or authors):
-            self.is_exist = False
+            is_exist = False
 
         reports = Report.objects.filter(
             Q(title__in=[*titles]) |
@@ -48,14 +52,14 @@ class ReportListView(generic.ListView):
         return render(request,
                       self.template_name,
                       context={self.context_object_name: reports,
-                               "is_all_blank": self.is_all_blank,
-                               "is_exist": self.is_exist})
+                               "is_all_blank": is_all_blank,
+                               "is_exist": is_exist})
 
 
 def report_detail_view(request, pk):
     list_id_like_comment = list()
     list_id_dislike_comment = list()
-    report = get_object_or_404(Report, pk=pk)
+    report = get_object_or_404(Report.objects.filter(status=Report.PUBLISHED), pk=pk)
     if request.user.is_authenticated:
         list_user_like_comments = UserLikeComment.objects.filter(user=request.user, comment__report=report)
         list_user_dislike_comments = UserDislikeComment.objects.filter(user=request.user, comment__report=report)
@@ -96,7 +100,7 @@ def report_create_view(request):
             report = form.save(commit=False)
             report.author = request.user
             report.save()
-            return redirect("report_detail", report.id)
+            return redirect("report_list")
     else:
         form = ReportForm()
     return render(request, "news/report_create_and_update.html", context={"form": form})
@@ -191,3 +195,65 @@ def comment_dislike_view(request, pk, comment_id):
             comment.save()
 
         return JsonResponse({"dislikes": comment.dislikes})
+
+
+class ReportPendingListView(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):
+    template_name = "news/report_pending_list.html"
+    context_object_name = "reports_pending"
+    paginate_by = 4
+
+    def get_queryset(self):
+        return Report.objects.filter(status=Report.PENDING).order_by("-datetime_modified")
+
+    def test_func(self):
+        return self.request.user in get_user_model().objects.filter(is_superuser=True)
+
+    def post(self, request, *args, **kwargs):
+        is_all_blank = False
+        is_exist = True
+        authors = get_user_model().objects.filter(
+            username__contains=request.POST["search"]
+        ) if "author-input" in request.POST else ''
+
+        titles = Report.objects.filter(
+            title__contains=request.POST["search"],
+            status=Report.PENDING,
+        ) if "title-input" in request.POST else ''
+
+        if titles == '' and authors == '':
+            is_all_blank = True
+        elif not (titles or authors):
+            is_exist = False
+
+        reports = Report.objects.filter(
+            Q(title__in=[*titles]) |
+            Q(author__in=[*authors])
+        ).filter(status=Report.PENDING).order_by("-datetime_modified")
+
+        return render(request,
+                      self.template_name,
+                      context={self.context_object_name: reports,
+                               "is_all_blank": is_all_blank,
+                               "is_exist": is_exist})
+
+
+class ReportPendingDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):
+    template_name = "news/report_pending_detail.html"
+    context_object_name = "report"
+
+    def get_queryset(self):
+        return Report.objects.filter(status=Report.PENDING)
+
+    def test_func(self):
+        return self.request.user in get_user_model().objects.filter(is_superuser=True)
+
+    def post(self, request, *args, **kwargs):
+        report = self.get_object()
+        if request.POST["confirm"] == "yes":
+            report.status = Report.PUBLISHED
+            report.save()
+            return redirect("report_list")
+        elif request.POST["confirm"] == "no":
+            report.status = Report.CANCELED
+            report.save()
+            return redirect("report_pending_list")
