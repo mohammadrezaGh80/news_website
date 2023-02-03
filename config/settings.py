@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     # third party
     'crispy_forms',
     'crispy_bootstrap5',
-    'vote',
     'captcha',
+    'jalali_date',
 
     # local
     'accounts',
@@ -118,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tehran'
 
 USE_I18N = True
 
@@ -155,3 +155,28 @@ MEDIA_ROOT = str(BASE_DIR.joinpath('media'))
 # recaptcha config
 RECAPTCHA_PUBLIC_KEY = '6LcFcVcjAAAAAG7iggdqVQbMLuWMTVjBSR7YKEUW'
 RECAPTCHA_PRIVATE_KEY = '6LcFcVcjAAAAAMqgAkSUsNVDy125Qbr2zyvQf3aN'
+
+# default settings for django jalali date
+JALALI_DATE_DEFAULTS = {
+   'Strftime': {
+        'date': '%Y/%m/%d',
+        'datetime': '%H:%M:%S - %Y/%m/%d',
+    },
+    'Static': {
+        'js': [
+            # loading datepicker
+            'admin/js/django_jalali.min.js',
+            # OR
+            # 'admin/jquery.ui.datepicker.jalali/scripts/jquery.ui.core.js',
+            # 'admin/jquery.ui.datepicker.jalali/scripts/calendar.js',
+            # 'admin/jquery.ui.datepicker.jalali/scripts/jquery.ui.datepicker-cc.js',
+            # 'admin/jquery.ui.datepicker.jalali/scripts/jquery.ui.datepicker-cc-fa.js',
+            # 'admin/js/main.js',
+        ],
+        'css': {
+            'all': [
+                'admin/jquery.ui.datepicker.jalali/themes/base/jquery-ui.min.css',
+            ]
+        }
+    },
+}

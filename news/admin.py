@@ -1,21 +1,42 @@
 from django.contrib import admin
 
+from jalali_date import datetime2jalali
+
 from .models import Report, Comment, CommentRelation, UserLikeComment, UserDislikeComment
 
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ("title", "author", "status", "datetime_created", "datetime_modified",)
+    list_display = ("title", "author", "status",
+                    "get_report_datetime_created_jalali", "get_report_datetime_modified_jalali",)
+
+    def get_report_datetime_created_jalali(self, obj):
+        return datetime2jalali(obj.datetime_created).strftime('%Y/%m/%d - %H:%M:%S')
+    get_report_datetime_created_jalali.short_description = "datetime_created"
+
+    def get_report_datetime_modified_jalali(self, obj):
+        return datetime2jalali(obj.datetime_modified).strftime('%Y/%m/%d - %H:%M:%S')
+    get_report_datetime_modified_jalali.short_description = "datetime_modified"
 
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "report", "likes", "dislikes", "datetime_created", "datetime_modified", )
+    list_display = ("id", "user", "report", "likes", "dislikes",
+                    "get_comment_datetime_created_jalali", "get_comment_datetime_modified_jalali", )
+
+    def get_comment_datetime_created_jalali(self, obj):
+        return datetime2jalali(obj.datetime_created).strftime('%Y/%m/%d - %H:%M:%S')
+    get_comment_datetime_created_jalali.short_description = "datetime_created"
+
+    def get_comment_datetime_modified_jalali(self, obj):
+        return datetime2jalali(obj.datetime_modified).strftime('%Y/%m/%d - %H:%M:%S')
+    get_comment_datetime_modified_jalali.short_description = "datetime_modified"
 
 
 @admin.register(CommentRelation)
 class CommentRelationAdmin(admin.ModelAdmin):
-    list_display = ("id", "get_reply_user_name", "get_reply_to_user_name", "get_report", "get_datetime", )
+    list_display = ("id", "get_reply_user_name", "get_reply_to_user_name",
+                    "get_report", "get_comment_datetime_jalali", )
 
     def get_reply_user_name(self, obj):
         return obj.reply.user
@@ -25,9 +46,9 @@ class CommentRelationAdmin(admin.ModelAdmin):
         return obj.reply_to.user
     get_reply_to_user_name.short_description = "reply's to username"
 
-    def get_datetime(self, obj):
-        return obj.reply.datetime_created
-    get_datetime.short_description = "datetime_created"
+    def get_comment_datetime_jalali(self, obj):
+        return datetime2jalali(obj.reply.datetime_created).strftime('%Y/%m/%d - %H:%M:%S')
+    get_comment_datetime_jalali.short_description = "datetime_created"
 
     def get_report(self, obj):
         return obj.reply.report

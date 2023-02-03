@@ -1,6 +1,7 @@
 {% extends "_base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load jalali_tags %}
 
 {% block page_title %}{{ report.title }}{% endblock page_title %}
 
@@ -194,7 +195,7 @@
                             </li>
                             <li class="text-white mt-3 mt-md-0 me-md-2">
                                 <i class="fa-regular fa-calendar fa-lg"></i>
-                                <span class="ms-1">{{ report.datetime_modified }}</span>
+                                <span class="ms-1">{{ report.datetime_modified|to_jalali }}</span>
                             </li>
                             {% if user.is_authenticated and request.user == report.author or user.is_superuser %}
                                 <li class="text-white mt-3 mt-md-0 me-md-2">
@@ -413,6 +414,7 @@
                     </form>
                 </div>
             {% endif %}
+        </div>
     </section>
 
     <button class="scroll-to-top position-fixed border-0 rounded" onclick="scrollToTop()">
