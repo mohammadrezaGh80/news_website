@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from jalali_date import datetime2jalali
 
-from .models import Report, Comment, CommentRelation, UserLikeComment, UserDislikeComment
+from .models import Report, Comment, CommentRelation, UserLikeComment, UserDislikeComment, Category, ReportCategory
 
 
 @admin.register(Report)
@@ -79,3 +79,21 @@ class UserLikeCommentAdmin(admin.ModelAdmin):
     def get_disliked_comment(self, obj):
         return obj.comment.text
     get_disliked_comment.short_description = "dislike's comment"
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", )
+
+
+@admin.register(ReportCategory)
+class ReportCategoryAdmin(admin.ModelAdmin):
+    list_display = ("report_title", "category_name", )
+
+    def report_title(self, obj):
+        return obj.report.title
+    report_title.short_description = "report's title"
+
+    def category_name(self, obj):
+        return obj.category.name
+    category_name.short_description = "category's name"

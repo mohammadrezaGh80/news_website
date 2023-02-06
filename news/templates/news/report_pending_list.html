@@ -157,6 +157,16 @@
             border-radius: 50%;
             background-color: #fff;
         }
+
+        .accordion{
+            --bs-accordion-active-bg: initial!important;
+            --bs-accordion-bg: initial!important;
+            --bs-accordion-active-color: initial!important;
+        }
+
+        .accordion-button:focus{
+            box-shadow:inset 0 calc(-1 * var(--bs-accordion-border-width)) 0 var(--bs-accordion-border-color)!important;
+        }
     </style>
 {% endblock page_style %}
 
@@ -176,20 +186,61 @@
                                     <i class="fa-solid fa-magnifying-glass"></i>
                                 </button>
                             </div>
-                            <p style="font-size: 18px" class="text-light">جستجو بر اساس:</p>
-                            <div class="form-check mt-2">
-                                <input class="form-check-input" name="title-input" type="checkbox" value="yes"
-                                       id="title-checkbox" checked>
-                                <label class="form-check-label text-light" for="title-checkbox">
-                                    عنوان
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" name="author-input" type="checkbox" value="yes"
-                                       id="author-checkbox" checked>
-                                <label class="form-check-label text-light" for="author-checkbox">
-                                    نویسنده
-                                </label>
+                            <div class="accordion my-4" id="accordionExample">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button text-white" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapseOne">
+                                            جستجو بر اساس
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse show">
+                                        <div class="accordion-body">
+                                            <div class="form-check mt-2">
+                                                <input class="form-check-input" name="title" type="checkbox"
+                                                       value="yes"
+                                                       id="title-checkbox" checked>
+                                                <label class="form-check-label text-light" for="title-checkbox">
+                                                    عنوان
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" name="author" type="checkbox"
+                                                       value="yes"
+                                                       id="author-checkbox" checked>
+                                                <label class="form-check-label text-light" for="author-checkbox">
+                                                    نویسنده
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button text-white" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapseTwo">
+                                            نوع خبر
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTwo" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            {% for category in categories %}
+                                                <div class="form-check">
+                                                    <input class="form-check-input" name="{{ category.name }}"
+                                                           type="checkbox"
+                                                           value="yes"
+                                                           id="{{ category.name }}-checkbox" checked>
+                                                    <label class="form-check-label text-light"
+                                                           for="{{ category.name }}-checkbox">
+                                                        {{ category.get_name_display }}
+                                                    </label>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>

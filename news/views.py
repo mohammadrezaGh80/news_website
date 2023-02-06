@@ -11,7 +11,7 @@ from django.http import JsonResponse
 
 from datetime import datetime
 
-from .models import Report, Comment, CommentRelation, UserLikeComment, UserDislikeComment
+from .models import Report, Comment, CommentRelation, UserLikeComment, UserDislikeComment, Category
 from .forms import ReportForm, CommentForm
 
 
@@ -21,11 +21,12 @@ class ReportListView(generic.ListView):
     paginate_by = 4
 
     def get_queryset(self):
-        return Report.objects.filter(status=Report.PUBLISHED).order_by("-datetime_modified")
+        return Report.report_published.order_by("-datetime_modified")
 
     def get_context_data(self, **kwargs):
         context = super(ReportListView, self).get_context_data(**kwargs)
         context["is_superuser"] = bool(self.request.user in get_user_model().objects.filter(is_superuser=True))
+        context["categories"] = Category.objects.all()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -33,27 +34,49 @@ class ReportListView(generic.ListView):
         is_exist = True
         authors = get_user_model().objects.filter(
             username__contains=request.POST["search"]
-        ) if "author-input" in request.POST else ''
+        ) if "author" in request.POST else ''
 
-        titles = Report.objects.filter(
+        titles = Report.report_published.filter(
             title__contains=request.POST["search"]
-        ) if "title-input" in request.POST else ''
+        ) if "title" in request.POST else ''
 
-        if titles == '' and authors == '':
+        news = list()
+        for category in Category.objects.all():
+            news.extend(Report.report_published.filter(
+                categories__category__name=category.name
+            )) if f"{category.name}" in request.POST else ''
+
+        news = list(sorted(set(news), key=lambda report: report.datetime_modified, reverse=True))
+
+        if titles == '' and authors == '' and not news:
             is_all_blank = True
-        elif not (titles or authors):
+        elif not (titles or authors or news) or not news:
             is_exist = False
 
-        reports = Report.objects.filter(
+        reports = Report.report_published.filter(
             Q(title__in=[*titles]) |
             Q(author__in=[*authors])
         ).order_by("-datetime_modified")
+
+        if reports:
+            if exist_reports := list(set(news) & {*reports}):
+                reports = list(sorted(exist_reports, key=lambda report: report.datetime_modified, reverse=True))
+            else:
+                reports = list()
+                is_exist = False
+        else:
+            if "title" in request.POST or "author" in request.POST:
+                is_exist = False
+            else:
+                reports = news
 
         return render(request,
                       self.template_name,
                       context={self.context_object_name: reports,
                                "is_all_blank": is_all_blank,
-                               "is_exist": is_exist})
+                               "is_exist": is_exist,
+                               "categories": Category.objects.all(),
+                               "is_superuser": bool(self.request.user in get_user_model().objects.filter(is_superuser=True))})
 
 
 def report_detail_view(request, pk):
@@ -90,7 +113,8 @@ def report_detail_view(request, pk):
                            "comment_form": comment_form,
                            "comments": report.comments.order_by("-datetime_created"),
                            "list_id_like_comment": list_id_like_comment,
-                           "list_id_dislike_comment": list_id_dislike_comment,})
+                           "list_id_dislike_comment": list_id_dislike_comment,
+                           "report_categories": report.categories.all()})
 
 
 def report_create_view(request):
@@ -208,21 +232,35 @@ class ReportPendingListView(LoginRequiredMixin, UserPassesTestMixin, generic.Lis
     def test_func(self):
         return self.request.user in get_user_model().objects.filter(is_superuser=True)
 
+    def get_context_data(self, **kwargs):
+        context = super(ReportPendingListView, self).get_context_data(**kwargs)
+        context["categories"] = Category.objects.all()
+        return context
+
     def post(self, request, *args, **kwargs):
         is_all_blank = False
         is_exist = True
         authors = get_user_model().objects.filter(
             username__contains=request.POST["search"]
-        ) if "author-input" in request.POST else ''
+        ) if "author" in request.POST else ''
 
         titles = Report.objects.filter(
             title__contains=request.POST["search"],
-            status=Report.PENDING,
-        ) if "title-input" in request.POST else ''
+            status=Report.PENDING
+        ) if "title" in request.POST else ''
 
-        if titles == '' and authors == '':
+        news = list()
+        for category in Category.objects.all():
+            news.extend(Report.objects.filter(
+                categories__category__name=category.name,
+                status=Report.PENDING
+            )) if f"{category.name}" in request.POST else ''
+
+        news = list(sorted(set(news), key=lambda report: report.datetime_modified, reverse=True))
+
+        if titles == '' and authors == '' and not news:
             is_all_blank = True
-        elif not (titles or authors):
+        elif not (titles or authors or news) or not news:
             is_exist = False
 
         reports = Report.objects.filter(
@@ -230,11 +268,26 @@ class ReportPendingListView(LoginRequiredMixin, UserPassesTestMixin, generic.Lis
             Q(author__in=[*authors])
         ).filter(status=Report.PENDING).order_by("-datetime_modified")
 
+        if reports:
+            if exist_reports := list(set(news) & {*reports}):
+                reports = list(sorted(exist_reports, key=lambda report: report.datetime_modified, reverse=True))
+            else:
+                reports = list()
+                is_exist = False
+        else:
+            if "title" in request.POST or "author" in request.POST:
+                is_exist = False
+            else:
+                reports = news
+
         return render(request,
                       self.template_name,
                       context={self.context_object_name: reports,
                                "is_all_blank": is_all_blank,
-                               "is_exist": is_exist})
+                               "is_exist": is_exist,
+                               "categories": Category.objects.all(),
+                               "is_superuser": bool(
+                                   self.request.user in get_user_model().objects.filter(is_superuser=True))})
 
 
 class ReportPendingDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):
@@ -246,6 +299,12 @@ class ReportPendingDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.D
 
     def test_func(self):
         return self.request.user in get_user_model().objects.filter(is_superuser=True)
+
+    def get_context_data(self, **kwargs):
+        context = super(ReportPendingDetailView, self).get_context_data(**kwargs)
+        report = self.get_object()
+        context["report_categories"] = report.categories.all()
+        return context
 
     def post(self, request, *args, **kwargs):
         report = self.get_object()

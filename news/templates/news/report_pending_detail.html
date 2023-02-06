@@ -170,6 +170,14 @@
         .wrapper-dislike .btn > i {
             color: #5f5f5f;
         }
+
+        .btn{
+            margin-top: -2px;
+            --bs-btn-hover-bg: initial!important;
+            --bs-btn-hover-color: #dc3545!important;
+            --bs-btn-active-bg: initial!important;
+            --bs-btn-active-color: #dc3545!important;
+        }
     </style>
 {% endblock page_style %}
 
@@ -205,6 +213,19 @@
                             </li>
                         </ul>
                         <p class="text-news-detail mt-3 mb-4">{{ report.description|linebreaksbr }}</p>
+                        {% if report_categories.count %}
+                            <div class="text-white d-flex">
+                                <span>برچسب ها:</span>
+                                <form action="{% url "report_pending_list" %}" method="post" class="ms-1">
+                                    {% csrf_token %}
+                                    {% for report_category in report_categories %}
+                                        <button type="submit" name="{{ report_category.category.name }}"
+                                                class="btn btn-outline-danger border-0 p-0">{{ report_category.category.get_name_display }}</button>
+                                        {% if not forloop.last %} ،{% endif %}
+                                    {% endfor %}
+                                </form>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -215,58 +236,3 @@
         <i class="fa-sharp fa-solid fa-arrow-up text-light fa-lg"></i>
     </button>
 {% endblock page_content %}
-
-
-{% block page_script %}
-    <script>
-        function scrollToTop() {
-            window.scrollTo(0, 0);
-        }
-
-        const listLikeIconBtn = document.getElementsByClassName("like-icon");
-        for (let likeIconBtn of listLikeIconBtn) {
-            likeIconBtn.addEventListener("click", function (event) {
-                event.preventDefault();
-                const countLikes = +this.closest("div.wrapper-like").firstElementChild.innerHTML
-                const commentId = likeIconBtn.getAttribute("data-id");
-                let formData = new FormData();
-                formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
-                axios.post(`like/${commentId}/`, formData)
-                    .then(res => {
-                        this.closest("div.wrapper-like").firstElementChild.innerHTML = `${res.data.likes}`
-                        if (res.data.likes === countLikes + 1) {
-                            this.firstElementChild.classList.add("text-white");
-                        } else {
-                            this.firstElementChild.classList.remove("text-white");
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
-            })
-        }
-
-        const listDislikeIconBtn = document.getElementsByClassName("dislike-icon");
-        for (let dislikeIconBtn of listDislikeIconBtn) {
-            dislikeIconBtn.addEventListener("click", function (event) {
-                event.preventDefault();
-                const countDislikes = +this.closest("div.wrapper-dislike").firstElementChild.innerHTML
-                const commentId = dislikeIconBtn.getAttribute("data-id");
-                let formData = new FormData();
-                formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
-                axios.post(`dislike/${commentId}/`, formData)
-                    .then(res => {
-                        this.closest("div.wrapper-dislike").firstElementChild.innerHTML = `${res.data.dislikes}`;
-                        if (res.data.dislikes === countDislikes + 1) {
-                            this.firstElementChild.classList.add("text-danger");
-                        } else {
-                            this.firstElementChild.classList.remove("text-danger");
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
-            })
-        }
-    </script>
-{% endblock page_script %}

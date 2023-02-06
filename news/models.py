@@ -4,6 +4,11 @@ from django.contrib.auth import get_user_model
 from datetime import date
 
 
+class ReportPublishedManager(models.Manager):
+    def get_queryset(self):
+        return super(ReportPublishedManager, self).get_queryset().filter(status=Report.PUBLISHED)
+
+
 class Report(models.Model):
     PENDING = "pending"
     PUBLISHED = "published"
@@ -22,6 +27,10 @@ class Report(models.Model):
 
     datetime_created = models.DateTimeField(auto_now_add=True)
     datetime_modified = models.DateTimeField(auto_now=True)
+
+    # Manager
+    objects = models.Manager()
+    report_published = ReportPublishedManager()
 
     def __str__(self):
         return self.title
@@ -101,3 +110,32 @@ class UserDislikeComment(models.Model):
 
     def __str__(self):
         return f"{self.user.username} dislikes {self.comment.text}"
+
+
+class Category(models.Model):
+    CATEGORY_NAME_CHOICES = (
+        ("sport", "ورزش"),
+        ("football", "فوتبال"),
+        ("political", "سیاسی"),
+        ("internal", "اخبار داخلی"),
+        ("foreign", "اخبار خارجی"),
+        ("exclusive", "اخبار اختصاصی"),
+    )
+    name = models.CharField(max_length=20, choices=CATEGORY_NAME_CHOICES)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
+
+class ReportCategory(models.Model):
+    report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name="categories")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="reports")
+
+    def __str__(self):
+        return f"{self.category.name} for {self.report.title}"
+
+    class Meta:
+        verbose_name_plural = "Report Categories"

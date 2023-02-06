@@ -1,4 +1,5 @@
 {% extends "_base.html" %}
+
 {% load static %}
 {% load crispy_forms_tags %}
 {% load jalali_tags %}
@@ -164,13 +165,21 @@
         .wrapper-like .btn,
         .wrapper-dislike .btn {
             --bs-btn-border-color: initial !important;
-            padding: 8px!important;
+            padding: 8px !important;
         }
 
-         .wrapper-like .btn > i,
-        .wrapper-dislike .btn > i{
+        .wrapper-like .btn > i,
+        .wrapper-dislike .btn > i {
             color: #5f5f5f;
-         }
+        }
+
+        .btn{
+            margin-top: -2px;
+            --bs-btn-hover-bg: initial!important;
+            --bs-btn-hover-color: #dc3545!important;
+            --bs-btn-active-bg: initial!important;
+            --bs-btn-active-color: #dc3545!important;
+        }
     </style>
 {% endblock page_style %}
 
@@ -209,6 +218,19 @@
                             {% endif %}
                         </ul>
                         <p class="text-news-detail mt-3 mb-4">{{ report.description|linebreaksbr }}</p>
+                        {% if report_categories.count %}
+                            <div class="text-white d-flex">
+                                <span>برچسب ها:</span>
+                                <form action="{% url "report_list" %}" method="post" class="ms-1">
+                                    {% csrf_token %}
+                                    {% for report_category in report_categories %}
+                                        <button type="submit" name="{{ report_category.category.name }}"
+                                                class="btn btn-outline-danger border-0 p-0">{{ report_category.category.get_name_display }}</button>
+                                        {% if not forloop.last %} ،{% endif %}
+                                    {% endfor %}
+                                </form>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="wrapper-comments card p-3 my-5">
                         <h3 style="font-family: 'Vazir-Bold',serif;" class="text-white mb-3">دیدگاه ها</h3>
@@ -440,9 +462,9 @@
                 axios.post(`like/${commentId}/`, formData)
                     .then(res => {
                         this.closest("div.wrapper-like").firstElementChild.innerHTML = `${res.data.likes}`
-                        if (res.data.likes === countLikes + 1){
+                        if (res.data.likes === countLikes + 1) {
                             this.firstElementChild.classList.add("text-white");
-                        }else{
+                        } else {
                             this.firstElementChild.classList.remove("text-white");
                         }
                     })
@@ -463,9 +485,9 @@
                 axios.post(`dislike/${commentId}/`, formData)
                     .then(res => {
                         this.closest("div.wrapper-dislike").firstElementChild.innerHTML = `${res.data.dislikes}`;
-                        if (res.data.dislikes === countDislikes + 1){
+                        if (res.data.dislikes === countDislikes + 1) {
                             this.firstElementChild.classList.add("text-danger");
-                        }else{
+                        } else {
                             this.firstElementChild.classList.remove("text-danger");
                         }
                     })
