@@ -5,10 +5,26 @@ from jalali_date import datetime2jalali
 from .models import Report, Comment, CommentRelation, UserLikeComment, UserDislikeComment, Category, ReportCategory
 
 
+class CommentInline(admin.TabularInline):
+    model = Comment
+    fields = ("user", "text", "likes", "dislikes", )
+    extra = 1
+
+
+class CommentRelationInline(admin.TabularInline):
+    model = CommentRelation
+    fields = ("reply", )
+    fk_name = "reply_to"
+    extra = 1
+
+
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
     list_display = ("title", "author", "status",
                     "get_report_datetime_created_jalali", "get_report_datetime_modified_jalali",)
+    inlines = [
+        CommentInline,
+    ]
 
     def get_report_datetime_created_jalali(self, obj):
         return datetime2jalali(obj.datetime_created).strftime('%Y/%m/%d - %H:%M:%S')
@@ -23,6 +39,9 @@ class ReportAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "report", "likes", "dislikes",
                     "get_comment_datetime_created_jalali", "get_comment_datetime_modified_jalali", )
+    inlines = [
+        CommentRelationInline,
+    ]
 
     def get_comment_datetime_created_jalali(self, obj):
         return datetime2jalali(obj.datetime_created).strftime('%Y/%m/%d - %H:%M:%S')
