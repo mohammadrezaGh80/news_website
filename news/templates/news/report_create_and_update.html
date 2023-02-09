@@ -27,6 +27,13 @@
     <section class="py-5 flex-grow-1" style="direction: ltr;background-color: #25272B">
         <div class="container">
             <div class="row">
+                {% if messages %}
+                    <ul class="mb-4" style="direction: rtl">
+                        {% for message in messages %}
+                            <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
                 <div class="col-12">
                     {% if request.resolver_match.view_name == "report_create" %}
                         <p style="direction: rtl" class="d-flex align-items-center">

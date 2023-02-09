@@ -97,6 +97,7 @@ def report_detail_view(request, pk):
             comment.report = report
             comment.datetime_modified = datetime.now()
             comment.save()
+            messages.success(request, "دیدگاه شما با موفقیت ثبت شد.")
             comment_form = CommentForm()
         else:
             error_labels = [field.label for field in comment_form for _ in field.errors]
@@ -124,22 +125,48 @@ def report_create_view(request):
             report = form.save(commit=False)
             report.author = request.user
             report.save()
+            messages.success(request, "خبر شما برای تایید ارسال شد.")
             return redirect("report_list")
+        else:
+            error_labels = [field.label for field in form for _ in field.errors]
+            if "Title" in error_labels:
+                messages.error(request, "عنوانی برای خبر وجود ندارد...")
+            if "Description" in error_labels:
+                messages.error(request, "توضیحاتی برای خبر وجود ندارد...")
+
     else:
         form = ReportForm()
     return render(request, "news/report_create_and_update.html", context={"form": form})
 
 
-class ReportUpdateView(generic.UpdateView):
+class ReportUpdateView(LoginRequiredMixin,  generic.UpdateView):
     model = Report
     form_class = ReportForm
     template_name = "news/report_create_and_update.html"
 
+    def form_valid(self, form):
+        report = self.object
+        messages.success(self.request, f'خبر "{report.title}" با موفقیت تغییر یافت.')
+        return super(ReportUpdateView, self).form_valid(form)
 
-class ReportDeleteView(generic.DeleteView):
+    def form_invalid(self, form):
+        error_labels = [field.label for field in form for _ in field.errors]
+        if "Title" in error_labels:
+            messages.error(self.request, "عنوانی برای خبر وجود ندارد...")
+        if "Description" in error_labels:
+            messages.error(self.request, "توضیحاتی برای خبر وجود ندارد...")
+        return super(ReportUpdateView, self).form_invalid(form)
+
+
+class ReportDeleteView(LoginRequiredMixin,  generic.DeleteView):
     model = Report
     template_name = "news/report_delete.html"
     success_url = reverse_lazy("report_list")
+
+    def form_valid(self, form):
+        report = self.object
+        messages.success(self.request, f'خبر "{report.title}" با موفقیت حذف شد.')
+        return super(ReportDeleteView, self).form_valid(form)
 
 
 @login_required
@@ -152,9 +179,18 @@ def reply_comment_view(request, pk, comment_id):
             new_comment = comment_form.save(commit=False)
             new_comment.user = request.user
             new_comment.report = report
+            new_comment.datetime_modified = datetime.now()
             new_comment.save()
+            messages.success(request, f"دیدگاه شما برای پاسخ به {comment.user.username} با موفقیت ثبت شد.")
             CommentRelation.objects.create(reply=new_comment, reply_to=comment)
             return redirect("report_detail", report.id)
+        else:
+            error_labels = [field.label for field in comment_form for _ in field.errors]
+            if "Text" in error_labels:
+                messages.error(request, "محتوایی برای دیدگاه وجود ندارد...")
+            if "Captcha" in error_labels:
+                messages.error(request, "کپچا تیک زده نشده است...")
+            return redirect("reply_comment", report.id, comment.id)
     else:
         comment_form = CommentForm()
     return render(request, "news/reply_comment.html",
@@ -171,11 +207,20 @@ def comment_update_view(request, pk, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
     if comment.user == request.user:
         comment_form = CommentForm(request.POST or None, instance=comment)
-        if comment_form.is_valid():
-            comment = comment_form.save(commit=False)
-            comment.datetime_modified = datetime.now()
-            comment.save()
-            return redirect("report_detail", report.id)
+        if request.method == "POST":
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.datetime_modified = datetime.now()
+                comment.save()
+                messages.success(request, "پیام شما با موفقیت تغییر یافت.")
+                return redirect("report_detail", report.id)
+            else:
+                error_labels = [field.label for field in comment_form for _ in field.errors]
+                if "Text" in error_labels:
+                    messages.error(request, "محتوایی برای دیدگاه وجود ندارد...")
+                if "Captcha" in error_labels:
+                    messages.error(request, "کپچا تیک زده نشده است...")
+                return redirect("edit_comment", report.id, comment.id)
 
         return render(request, "news/reply_comment.html",
                       context={"comment": comment.get_root_comment(),
@@ -311,8 +356,10 @@ class ReportPendingDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.D
         if request.POST["confirm"] == "yes":
             report.status = Report.PUBLISHED
             report.save()
+            messages.success(request, f'خبر "{report.title}" تایید شد.')
             return redirect("report_list")
         elif request.POST["confirm"] == "no":
             report.status = Report.CANCELED
             report.save()
+            messages.error(request, f'خبر "{report.title}" رد شد.')
             return redirect("report_pending_list")

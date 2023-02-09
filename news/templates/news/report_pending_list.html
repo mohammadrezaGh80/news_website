@@ -158,14 +158,14 @@
             background-color: #fff;
         }
 
-        .accordion{
-            --bs-accordion-active-bg: initial!important;
-            --bs-accordion-bg: initial!important;
-            --bs-accordion-active-color: initial!important;
+        .accordion {
+            --bs-accordion-active-bg: initial !important;
+            --bs-accordion-bg: initial !important;
+            --bs-accordion-active-color: initial !important;
         }
 
-        .accordion-button:focus{
-            box-shadow:inset 0 calc(-1 * var(--bs-accordion-border-width)) 0 var(--bs-accordion-border-color)!important;
+        .accordion-button:focus {
+            box-shadow: inset 0 calc(-1 * var(--bs-accordion-border-width)) 0 var(--bs-accordion-border-color) !important;
         }
     </style>
 {% endblock page_style %}
@@ -174,6 +174,13 @@
     <section style="background-color: #25272B;" class="py-5 flex-grow-1">
         <div class="container">
             <div class="row">
+                {% if messages %}
+                    <ul class="mb-4">
+                        {% for message in messages %}
+                            <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
                 <div class="col-12 col-lg-3">
                     <div class="wrapper-search-box p-3" style="background-color: #202125;">
                         <form action="" method="POST">
