@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from django.contrib.messages import constants as messages
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -117,12 +118,22 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LOCALE_PATHS = (
+    os.path.join("templates", 'locale'),
+)
+
+LANGUAGE_CODE = 'fa'
+# LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = (
+    ("en-us", "English"),
+    ("fa", "Persian"),
+)
 
 TIME_ZONE = 'Asia/Tehran'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
 

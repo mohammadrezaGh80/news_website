@@ -1,0 +1,71 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-02-10 09:25+0330\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: .\registration\login.html:6 .\registration\login.html:72
+msgid "Login to website"
+msgstr "ورود به وبسایت"
+
+#: .\registration\login.html:62
+msgid "Create an account"
+msgstr "ساخت یک اکانت جدید"
+
+#: .\registration\login.html:64
+msgid "Forgot password"
+msgstr "فراموشی رمز عبور"
+
+#: .\registration\login.html:77 .\registration\signup.html:71
+msgid "Username"
+msgstr "نام کاربری"
+
+#: .\registration\login.html:81 .\registration\signup.html:90
+msgid "Password"
+msgstr "رمز عبور"
+
+#: .\registration\login.html:85
+msgid "Login"
+msgstr "ورود"
+
+#: .\registration\signup.html:7 .\registration\signup.html:100
+msgid "Signup"
+msgstr "ثبت نام"
+
+#: .\registration\signup.html:58
+msgid "Login to account"
+msgstr "ورود به وبسایت"
+
+#: .\registration\signup.html:66
+msgid "Signup to website"
+msgstr "ثبت نام در وبسایت"
+
+#: .\registration\signup.html:76
+msgid "Phone number"
+msgstr "شماره تلفن"
+
+#: .\registration\signup.html:82
+msgid "Age"
+msgstr "سن"
+
+#: .\registration\signup.html:86
+msgid "Email"
+msgstr "ایمیل"
+
+#: .\registration\signup.html:95
+msgid "Password confirmation"
+msgstr "تکرار رمز عبور"

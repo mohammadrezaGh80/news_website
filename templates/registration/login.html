@@ -1,48 +1,50 @@
 {% extends "_base.html" %}
 {% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 
-{% block page_title %}ورود به سایت{% endblock page_title %}
-{% load crispy_forms_tags %}
+{% block page_title %}{% trans "Login to website" %}{% endblock page_title %}
 
 {% block page_style %}
     <style>
-        .wrapper-login{
+        .wrapper-login {
             min-height: 500px;
         }
 
-        .wrapper-img-login, .wrapper-form{
+        .wrapper-img-login, .wrapper-form {
             height: 350px;
         }
 
-        .wrapper-img-login img{
+        .wrapper-img-login img {
             object-fit: contain;
         }
 
-        .btn-login{
+        .btn-login {
             width: 100px;
             height: 45px;
         }
 
-        .wrapper-social-media .social-media > li > a{
+        .wrapper-social-media .social-media > li > a {
             width: 35px;
             height: 35px;
         }
 
-        .wrapper-form form input{
+        .wrapper-form form input {
             outline: none;
             border: 1px solid rgb(125, 125, 125);
             padding: 8px 5px;
             border-radius: 4px;
         }
 
-        .wrapper-links .links a:last-child{
+        .wrapper-links .links a:last-child {
             width: fit-content;
         }
     </style>
 {% endblock page_style %}
 
 {% block page_content %}
-    <section class="py-5 flex-grow-1">
+    <section style="direction: {% if LANGUAGE_CODE == "en-us" %}
+ltr{% elif LANGUAGE_CODE == "fa" %}rtl{% endif %}" class="py-5 flex-grow-1">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-8 offset-lg-2">
@@ -51,12 +53,15 @@
                             <div style="min-height: inherit;" class="col-12 col-lg-6 order-1 order-lg-0">
                                 <div style="min-height: inherit;" class="right-side-login d-flex flex-column">
                                     <figure class="wrapper-img-login">
-                                        <img class="d-block w-100 h-100" src="{% static 'img/signin-image.jpg' %}" alt="">
+                                        <img class="d-block w-100 h-100" src="{% static 'img/signin-image.jpg' %}"
+                                             alt="">
                                     </figure>
                                     <div class="wrapper-links d-flex justify-content-center align-items-center flex-grow-1">
                                         <div class="links d-flex flex-column align-items-center">
-                                            <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;" href="{% url 'signup' %}" class="mb-2">ساخت یک حساب جدید</a>
-                                            <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;" href="{% url 'password_reset' %}">فراموشی رمز عبور</a>
+                                            <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;"
+                                               href="{% url 'signup' %}" class="mb-2">{% trans "Create an account" %}</a>
+                                            <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;"
+                                               href="{% url 'password_reset' %}">{% trans "Forgot password" %}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -64,12 +69,21 @@
                             <div style="min-height: inherit;" class="col-12 col-lg-6 order-0 order-lg-1">
                                 <div style="min-height: inherit;" class="left-side-login d-flex flex-column px-3">
                                     <div class="wrapper-form d-flex flex-column">
-                                        <h3 style="font-family: 'Vazir-Bold', serif;color: #3B5999;font-size: 25px;">ورود به سایت</h3>
-                                        <form action="" method="POST" class="d-flex flex-column flex-grow-1 justify-content-center" style="direction: ltr">
+                                        <h3 style="font-family: 'Vazir-Bold', serif;color: #3B5999;font-size: 25px;">{% trans "Login to website" %}</h3>
+                                        <form action="" method="POST"
+                                              class="d-flex flex-column flex-grow-1 justify-content-center">
                                             {% csrf_token %}
-                                            {{ form|crispy }}
+                                            <div class="mb-3 d-flex flex-column">
+                                                <label class="form-label required" for="username_input">{% trans "Username" %}</label>
+                                                <input class="form-control" type="text" id="username_input" name="username" required>
+                                            </div>
+                                            <div class="d-flex flex-column">
+                                                <label class="form-label required" for="password_input">{% trans "Password" %}</label>
+                                                <input class="form-control" type="password" id="password_input" name="password" required>
+                                            </div>
                                             <div class="d-flex justify-content-end">
-                                                <button type="submit" class="btn btn-primary btn-login mt-5">ورود</button>
+                                                <button type="submit" class="btn btn-primary btn-login mt-5">{% trans "Login" %}
+                                                </button>
                                             </div>
                                         </form>
                                     </div>

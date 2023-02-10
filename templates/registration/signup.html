@@ -1,34 +1,36 @@
 {% extends "_base.html" %}
 {% load static %}
-
-{% block page_title %}ثبت نام{% endblock page_title %}
 {% load crispy_forms_tags %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block page_title %}{% trans "Signup" %}{% endblock page_title %}
 
 {% block page_style %}
     <style>
-        .wrapper-signup{
+        .wrapper-signup {
             min-height: 650px;
         }
 
-        .wrapper-img-signup, .wrapper-form{
+        .wrapper-img-signup, .wrapper-form {
             height: 400px;
         }
 
-        .wrapper-img-signup img{
+        .wrapper-img-signup img {
             object-fit: scale-down;
         }
 
-        .btn-signup{
+        .btn-signup {
             width: 100px;
             height: 45px;
         }
 
-        .wrapper-social-media .social-media > li > a{
+        .wrapper-social-media .social-media > li > a {
             width: 35px;
             height: 35px;
         }
 
-        .wrapper-form form input{
+        .wrapper-form form input {
             outline: none;
             border: 1px solid rgb(125, 125, 125);
             padding: 8px 5px;
@@ -38,7 +40,8 @@
 {% endblock page_style %}
 
 {% block page_content %}
-    <section class="py-5 flex-grow-1">
+    <section style="direction: {% if LANGUAGE_CODE == "en-us" %}
+ltr{% elif LANGUAGE_CODE == "fa" %}rtl{% endif %}" class="py-5 flex-grow-1">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-8 offset-lg-2">
@@ -47,22 +50,55 @@
                             <div style="min-height: inherit;" class="col-12 col-lg-6 order-1 order-lg-0">
                                 <div style="min-height: inherit;" class="right-side-signup d-flex flex-column">
                                     <figure class="wrapper-img-signup">
-                                        <img class="d-block w-100 h-100" src="{% static 'img/signup-image.jpg' %}" alt="">
+                                        <img class="d-block w-100 h-100" src="{% static 'img/signup-image.jpg' %}"
+                                             alt="">
                                     </figure>
                                     <div class="wrapper-link-login d-flex justify-content-center align-items-center flex-grow-1">
-                                        <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;" href="{% url 'login' %}">ورود به حساب</a>
+                                        <a style="font-family: 'Vazir-Bold', serif;color: #3B5999;border-bottom: 1px solid #3B5999;"
+                                           href="{% url 'login' %}">{% trans "Login to account" %}</a>
                                     </div>
                                 </div>
                             </div>
                             <div style="min-height: inherit;" class="col-12 col-lg-6 order-0 order-lg-1">
                                 <div style="min-height: inherit;" class="left-side-signup d-flex flex-column px-4">
                                     <div class="wrapper-form d-flex flex-column">
-                                        <h3 class="mb-3" style="font-family: 'Vazir-Bold', serif;color: #3B5999;font-size: 25px;">ثبت نام در سایت</h3>
-                                        <form action="" method="POST" class="d-flex flex-column flex-grow-1 justify-content-center" style="direction: ltr">
+                                        <h3 class="mb-3"
+                                            style="font-family: 'Vazir-Bold', serif;color: #3B5999;font-size: 25px;">{% trans "Signup to website" %}</h3>
+                                        <form action="" method="POST"
+                                              class="d-flex flex-column flex-grow-1 justify-content-center">
                                             {% csrf_token %}
-                                            {{ form|crispy }}
+                                            <div class="mb-3 d-flex flex-column">
+                                                <label class="form-label required" for="username_input">{% trans "Username" %}</label>
+                                                <input class="form-control" type="text" id="username_input"
+                                                       name="username" required>
+                                            </div>
+                                            <div class="mb-3 d-flex flex-column">
+                                                <label class="form-label required" for="phone_number_input">{% trans "Phone number" %}</label>
+                                                <input class="form-control" type="text" id="phone_number_input"
+                                                       name="phone_number" required pattern="09[0-9]{9}"
+                                                       title="!phone number is incorrect">
+                                            </div>
+                                            <div class="mb-3 d-flex flex-column">
+                                                <label class="form-label optional-{{ LANGUAGE_CODE }}" for="age_input">{% trans "Age" %}</label>
+                                                <input class="form-control" type="number" id="age_input" name="age">
+                                            </div>
+                                            <div class="mb-3 d-flex flex-column">
+                                                <label class="form-label optional-{{ LANGUAGE_CODE }}" for="email_input">{% trans "Email" %}</label>
+                                                <input class="form-control" type="email" id="email_input" name="email">
+                                            </div>
+                                            <div class="mb-3 d-flex flex-column">
+                                                <label class="form-label required" for="password1_input">{% trans "Password" %}</label>
+                                                <input class="form-control" type="password" id="password1_input"
+                                                       name="password1">
+                                            </div>
+                                            <div class="mb-3 d-flex flex-column">
+                                                <label class="form-label required" for="password2_input">{% trans "Password confirmation" %}</label>
+                                                <input class="form-control" type="password" id="password2_input"
+                                                       name="password2">
+                                            </div>
                                             <div class="d-flex justify-content-end">
-                                                <button type="submit" class="btn btn-primary btn-signup mt-5">ثبت نام</button>
+                                                <button type="submit" class="btn btn-primary btn-signup mt-5">{% trans "Signup" %}
+                                                </button>
                                             </div>
                                         </form>
                                     </div>
