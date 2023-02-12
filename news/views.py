@@ -8,10 +8,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from datetime import datetime
 
-from .models import Report, Comment, CommentRelation, UserLikeComment, UserDislikeComment, Category
+from .models import Report, Comment, CommentRelation, UserLikeComment, UserDislikeComment, Category, ReportCategory
 from .forms import ReportForm, CommentForm
 
 
@@ -24,59 +25,22 @@ class ReportListView(generic.ListView):
         return Report.report_published.order_by("-datetime_modified")
 
     def get_context_data(self, **kwargs):
+        if self.request.session.get("search_info") is None:
+            self.request.session["search_info"] = {"input_value": "", "title": "", "author": "",
+                                                   "categories": {category.name: True for category in
+                                                                  Category.objects.all()}}
+
         context = super(ReportListView, self).get_context_data(**kwargs)
         context["is_superuser"] = bool(self.request.user in get_user_model().objects.filter(is_superuser=True))
         context["categories"] = Category.objects.all()
+        context["is_all_blank"] = False
+        context["is_exist"] = True
+        context["all_categories_checked"] = [category_name for category_name, value in
+                                             self.request.session["search_info"]["categories"].items() if value]
+        context["is_title_exist"] = bool(self.request.session["search_info"]["title"])
+        context["is_author_exist"] = bool(self.request.session["search_info"]["author"])
+        context["input_value"] = self.request.session["search_info"]["input_value"]
         return context
-
-    def post(self, request, *args, **kwargs):
-        is_all_blank = False
-        is_exist = True
-        authors = get_user_model().objects.filter(
-            username__contains=request.POST["search"]
-        ) if "author" in request.POST else ''
-
-        titles = Report.report_published.filter(
-            title__contains=request.POST["search"]
-        ) if "title" in request.POST else ''
-
-        news = list()
-        for category in Category.objects.all():
-            news.extend(Report.report_published.filter(
-                categories__category__name=category.name
-            )) if f"{category.name}" in request.POST else ''
-
-        news = list(sorted(set(news), key=lambda report: report.datetime_modified, reverse=True))
-
-        if titles == '' and authors == '' and not news:
-            is_all_blank = True
-        elif not (titles or authors or news) or not news:
-            is_exist = False
-
-        reports = Report.report_published.filter(
-            Q(title__in=[*titles]) |
-            Q(author__in=[*authors])
-        ).order_by("-datetime_modified")
-
-        if reports:
-            if exist_reports := list(set(news) & {*reports}):
-                reports = list(sorted(exist_reports, key=lambda report: report.datetime_modified, reverse=True))
-            else:
-                reports = list()
-                is_exist = False
-        else:
-            if "title" in request.POST or "author" in request.POST:
-                is_exist = False
-            else:
-                reports = news
-
-        return render(request,
-                      self.template_name,
-                      context={self.context_object_name: reports,
-                               "is_all_blank": is_all_blank,
-                               "is_exist": is_exist,
-                               "categories": Category.objects.all(),
-                               "is_superuser": bool(self.request.user in get_user_model().objects.filter(is_superuser=True))})
 
 
 def report_detail_view(request, pk):
@@ -139,7 +103,7 @@ def report_create_view(request):
     return render(request, "news/report_create_and_update.html", context={"form": form})
 
 
-class ReportUpdateView(LoginRequiredMixin,  generic.UpdateView):
+class ReportUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Report
     form_class = ReportForm
     template_name = "news/report_create_and_update.html"
@@ -158,7 +122,7 @@ class ReportUpdateView(LoginRequiredMixin,  generic.UpdateView):
         return super(ReportUpdateView, self).form_invalid(form)
 
 
-class ReportDeleteView(LoginRequiredMixin,  generic.DeleteView):
+class ReportDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Report
     template_name = "news/report_delete.html"
     success_url = reverse_lazy("report_list")
@@ -274,65 +238,26 @@ class ReportPendingListView(LoginRequiredMixin, UserPassesTestMixin, generic.Lis
     def get_queryset(self):
         return Report.objects.filter(status=Report.PENDING).order_by("-datetime_modified")
 
-    def test_func(self):
-        return self.request.user in get_user_model().objects.filter(is_superuser=True)
-
     def get_context_data(self, **kwargs):
+        if self.request.session.get("pending_search_info") is None:
+            self.request.session["pending_search_info"] = {
+                "title": "", "author": "", "input_value": "",
+                "categories": {category.name: True for category in Category.objects.all()}
+            }
+
         context = super(ReportPendingListView, self).get_context_data(**kwargs)
         context["categories"] = Category.objects.all()
+        context["is_all_blank"] = False
+        context["is_exist"] = True
+        context["all_categories_checked"] = [category_name for category_name, value in
+                                             self.request.session["pending_search_info"]["categories"].items() if value]
+        context["is_title_exist"] = bool(self.request.session["pending_search_info"]["title"])
+        context["is_author_exist"] = bool(self.request.session["pending_search_info"]["author"])
+        context["input_value"] = self.request.session["pending_search_info"]["input_value"]
         return context
 
-    def post(self, request, *args, **kwargs):
-        is_all_blank = False
-        is_exist = True
-        authors = get_user_model().objects.filter(
-            username__contains=request.POST["search"]
-        ) if "author" in request.POST else ''
-
-        titles = Report.objects.filter(
-            title__contains=request.POST["search"],
-            status=Report.PENDING
-        ) if "title" in request.POST else ''
-
-        news = list()
-        for category in Category.objects.all():
-            news.extend(Report.objects.filter(
-                categories__category__name=category.name,
-                status=Report.PENDING
-            )) if f"{category.name}" in request.POST else ''
-
-        news = list(sorted(set(news), key=lambda report: report.datetime_modified, reverse=True))
-
-        if titles == '' and authors == '' and not news:
-            is_all_blank = True
-        elif not (titles or authors or news) or not news:
-            is_exist = False
-
-        reports = Report.objects.filter(
-            Q(title__in=[*titles]) |
-            Q(author__in=[*authors])
-        ).filter(status=Report.PENDING).order_by("-datetime_modified")
-
-        if reports:
-            if exist_reports := list(set(news) & {*reports}):
-                reports = list(sorted(exist_reports, key=lambda report: report.datetime_modified, reverse=True))
-            else:
-                reports = list()
-                is_exist = False
-        else:
-            if "title" in request.POST or "author" in request.POST:
-                is_exist = False
-            else:
-                reports = news
-
-        return render(request,
-                      self.template_name,
-                      context={self.context_object_name: reports,
-                               "is_all_blank": is_all_blank,
-                               "is_exist": is_exist,
-                               "categories": Category.objects.all(),
-                               "is_superuser": bool(
-                                   self.request.user in get_user_model().objects.filter(is_superuser=True))})
+    def test_func(self):
+        return self.request.user in get_user_model().objects.filter(is_superuser=True)
 
 
 class ReportPendingDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):
@@ -363,3 +288,218 @@ class ReportPendingDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.D
             report.save()
             messages.error(request, f'خبر "{report.title}" رد شد.')
             return redirect("report_pending_list")
+
+
+def report_search(request):
+    search_info = request.session.get("search_info")
+
+    is_all_blank = False
+    is_exist = True
+    titles = []
+    authors = []
+
+    if request.method == "POST":
+        print(request.POST)
+        if "title" in request.POST:
+            search_info["title"] = request.POST["search"]
+            titles = Report.report_published.filter(
+                title__contains=search_info["title"]
+            )
+        else:
+            search_info["title"] = ""
+
+        if "author" in request.POST:
+            search_info["author"] = request.POST["search"]
+            authors = get_user_model().objects.filter(
+                username__contains=search_info["author"]
+            )
+        else:
+            search_info["author"] = ""
+
+        search_info["input_value"] = request.POST["search"]
+        request.session.modified = True
+
+        for category in Category.objects.all():
+            if category.name in request.POST:
+                search_info["categories"][category.name] = True
+            else:
+                search_info["categories"][category.name] = False
+        request.session.modified = True
+
+    if search_info["title"]:
+        titles = Report.report_published.filter(title__contains=search_info["title"])
+    if search_info["author"]:
+        authors = get_user_model().objects.filter(username__contains=search_info["author"])
+
+    news = Report.report_published.filter(
+        categories__category__name__in=[category_name for category_name in search_info["categories"] if
+                                        search_info["categories"][category_name] is True]
+    ).distinct().order_by("-datetime_modified")
+
+    if titles == '' and authors == '' and not news:
+        is_all_blank = True
+    elif not (titles or authors or news) or not news:
+        is_exist = False
+
+    reports = Report.report_published.filter(
+        Q(title__in=[*titles]) |
+        Q(author__in=[*authors])
+    ).order_by("-datetime_modified")
+
+    if reports:
+        if exist_reports := list(set(news) & {*reports}):
+            reports = list(sorted(exist_reports, key=lambda report: report.datetime_modified, reverse=True))
+        else:
+            reports = list()
+            is_exist = False
+    else:
+        if search_info["title"] or search_info["author"]:
+            is_exist = False
+        else:
+            reports = news
+
+    paginator = Paginator(reports, 4)
+    page = request.GET.get('page', 1)
+
+    try:
+        reports = paginator.page(page)
+    except PageNotAnInteger:
+        reports = paginator.page(1)
+    except EmptyPage:
+        reports = paginator.page(paginator.num_pages)
+
+    return render(request,
+                  "news/report_list.html",
+                  context={"reports": reports, "is_all_blank": is_all_blank,
+                           "is_exist": is_exist, "categories": Category.objects.all(),
+                           "is_superuser": bool(request.user in get_user_model().objects.filter(is_superuser=True)),
+                           "page_obj": reports,
+                           "is_title_exist": bool(search_info["title"]),
+                           "is_author_exist": bool(search_info["author"]),
+                           "input_value": search_info["input_value"],
+                           "all_categories_checked": [category_name for category_name, value in
+                                                      search_info["categories"].items() if value]})
+
+
+@login_required
+def report_pending_search(request):
+    if request.user in get_user_model().objects.filter(is_superuser=True):
+
+        pending_search_info = request.session.get("pending_search_info")
+
+        is_all_blank = False
+        is_exist = True
+        titles = []
+        authors = []
+
+        if request.method == "POST":
+            if "title" in request.POST:
+                pending_search_info["title"] = request.POST["search"]
+                titles = Report.objects.filter(
+                    title__contains=pending_search_info["title"],
+                    status=Report.PENDING,
+                )
+            else:
+                pending_search_info["title"] = ""
+
+            if "author" in request.POST:
+                pending_search_info["author"] = request.POST["search"]
+                authors = get_user_model().objects.filter(
+                    username__contains=pending_search_info["author"]
+                )
+            else:
+                pending_search_info["author"] = ""
+
+            pending_search_info["input_value"] = request.POST["search"]
+            request.session.modified = True
+
+            for category in Category.objects.all():
+                if category.name in request.POST:
+                    pending_search_info["categories"][category.name] = True
+                else:
+                    pending_search_info["categories"][category.name] = False
+            request.session.modified = True
+
+        if pending_search_info["title"]:
+            titles = Report.objects.filter(title__contains=pending_search_info["title"], status=Report.PENDING)
+        if pending_search_info["author"]:
+            authors = get_user_model().objects.filter(username__contains=pending_search_info["author"])
+
+        news = Report.objects.filter(
+            categories__category__name__in=[category_name for category_name in pending_search_info["categories"] if
+                                            pending_search_info["categories"][category_name] is True]
+        ).filter(status=Report.PENDING).distinct().order_by("-datetime_modified")
+
+        if titles == '' and authors == '' and not news:
+            is_all_blank = True
+        elif not (titles or authors or news) or not news:
+            is_exist = False
+
+        reports = Report.objects.filter(
+            Q(title__in=[*titles]) |
+            Q(author__in=[*authors])
+        ).filter(status=Report.PENDING).order_by("-datetime_modified")
+
+        if reports:
+            if exist_reports := list(set(news) & {*reports}):
+                reports = list(sorted(exist_reports, key=lambda report: report.datetime_modified, reverse=True))
+            else:
+                reports = list()
+                is_exist = False
+        else:
+            if pending_search_info["title"] or pending_search_info["author"]:
+                is_exist = False
+            else:
+                reports = news
+
+        paginator = Paginator(reports, 4)
+        page = request.GET.get('page', 1)
+
+        try:
+            reports = paginator.page(page)
+        except PageNotAnInteger:
+            reports = paginator.page(1)
+        except EmptyPage:
+            reports = paginator.page(paginator.num_pages)
+
+        return render(request, "news/report_pending_list.html",
+                      context={"reports_pending": reports,
+                               "is_all_blank": is_all_blank,
+                               "is_exist": is_exist,
+                               "categories": Category.objects.all(),
+                               "is_superuser": bool(request.user in get_user_model().objects.filter(is_superuser=True)),
+                               "page_obj": reports,
+                               "is_title_exist": bool(pending_search_info["title"]),
+                               "is_author_exist": bool(pending_search_info["author"]),
+                               "input_value": pending_search_info["input_value"],
+                               "all_categories_checked": [category_name for category_name, value in
+                                                          pending_search_info["categories"].items() if value]})
+    raise PermissionDenied()
+
+
+def get_reports_based_on_category(request, category_name):
+    reports = Report.report_published.filter(categories__category__name=category_name).order_by("-datetime_modified")
+
+    paginator = Paginator(reports, 4)
+    page = request.GET.get('page', 1)
+
+    try:
+        reports = paginator.page(page)
+    except PageNotAnInteger:
+        reports = paginator.page(1)
+    except EmptyPage:
+        reports = paginator.page(paginator.num_pages)
+
+    return render(request, "news/report_list.html",
+                  context={"reports": reports,
+                           "is_superuser": bool(request.user in get_user_model().objects.filter(is_superuser=True)),
+                           "categories": Category.objects.all(),
+                           "is_all_blank": False,
+                           "is_exist": True,
+                           "page_obj": reports,
+                           "all_categories_checked": [category_name for category_name, value in
+                                                      request.session["search_info"]["categories"].items() if value],
+                           "is_title_exist": bool(request.session["search_info"]["title"]),
+                           "is_author_exist": bool(request.session["search_info"]["author"]),
+                           "input_value": request.session["search_info"]["input_value"]
+                           })

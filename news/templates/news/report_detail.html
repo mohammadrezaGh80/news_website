@@ -228,14 +228,14 @@
                         {% if report_categories.count %}
                             <div class="text-white d-flex">
                                 <span>برچسب ها:</span>
-                                <form action="{% url "report_list" %}" method="post" class="ms-1">
-                                    {% csrf_token %}
-                                    {% for report_category in report_categories %}
+                                {% for report_category in report_categories %}
+                                    <form action="{% url "reports_category" report_category.category.name %}" method="post" class="ms-1">
+                                        {% csrf_token %}
                                         <button type="submit" name="{{ report_category.category.name }}"
                                                 class="btn btn-outline-danger border-0 p-0">{{ report_category.category.get_name_display }}</button>
                                         {% if not forloop.last %} ،{% endif %}
-                                    {% endfor %}
-                                </form>
+                                    </form>
+                                {% endfor %}
                             </div>
                         {% endif %}
                     </div>

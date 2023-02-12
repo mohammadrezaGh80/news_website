@@ -22,6 +22,7 @@ class CommentRelationInline(admin.TabularInline):
 class ReportAdmin(admin.ModelAdmin):
     list_display = ("title", "author", "status",
                     "get_report_datetime_created_jalali", "get_report_datetime_modified_jalali",)
+    ordering = ("-datetime_modified",)
     inlines = [
         CommentInline,
     ]
