@@ -48,14 +48,14 @@
                                 <form action="" method="POST" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     {{ form|crispy }}
+                                    <label for="category_select">Categories:</label>
+                                    <select class="form-select" name="category" id="category_select" multiple>
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
                                     <div class="d-flex justify-content-end">
-                                        <button type="submit" class="btn btn-success">
-                                            {% if request.resolver_match.view_name == "report_create" %}
-                                                ایجاد
-                                            {% else %}
-                                                ویرایش
-                                            {% endif %}
-                                        </button>
+                                        <button type="submit" class="btn btn-success">ایجاد</button>
                                     </div>
                                 </form>
                             </div>
@@ -91,14 +91,15 @@
                                 <form action="" method="POST" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     {{ form|crispy }}
+                                    <label for="category_select">Categories:</label>
+                                    <select class="form-select" name="category" id="category_select" multiple>
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}"
+                                            {% if category in all_selected_categories %}selected{% endif %}>{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
                                     <div class="d-flex justify-content-end">
-                                        <button class="btn btn-success">
-                                            {% if request.resolver_match.view_name == "report_create" %}
-                                                ایجاد
-                                            {% else %}
-                                                ویرایش
-                                            {% endif %}
-                                        </button>
+                                        <button class="btn btn-success">ویرایش</button>
                                     </div>
                                 </form>
                             </div>

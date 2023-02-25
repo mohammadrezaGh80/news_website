@@ -35,6 +35,7 @@ class ReportListView(generic.ListView):
         context["categories"] = Category.objects.all()
         context["is_all_blank"] = False
         context["is_exist"] = True
+        context["count_pending_reports"] = Report.objects.filter(status=Report.PENDING).count()
         context["all_categories_checked"] = [category_name for category_name, value in
                                              self.request.session["search_info"]["categories"].items() if value]
         context["is_title_exist"] = bool(self.request.session["search_info"]["title"])
@@ -85,11 +86,20 @@ def report_detail_view(request, pk):
 def report_create_view(request):
     if request.method == "POST":
         form = ReportForm(request.POST, request.FILES)
-        if form.is_valid():
+        list_categories_id = request.POST.getlist("category") if "category" in request.POST else None
+        if form.is_valid() and list_categories_id:
             report = form.save(commit=False)
             report.author = request.user
+            if request.user in get_user_model().objects.filter(is_superuser=True):
+                report.status = Report.PUBLISHED
+                messages.success(request, f'خبر "{report.title}" بارگزاری شد.')
+            else:
+                messages.success(request, "خبر شما برای تایید ارسال شد.")
             report.save()
-            messages.success(request, "خبر شما برای تایید ارسال شد.")
+
+            for category_id in list_categories_id:
+                ReportCategory.objects.create(report=report, category=Category.objects.get(pk=category_id))
+
             return redirect("report_list")
         else:
             error_labels = [field.label for field in form for _ in field.errors]
@@ -100,13 +110,62 @@ def report_create_view(request):
 
     else:
         form = ReportForm()
-    return render(request, "news/report_create_and_update.html", context={"form": form})
+    return render(request, "news/report_create_and_update.html",
+                  context={"form": form, "categories": Category.objects.all()})
+
+
+def report_update_view(request, pk):
+    if request.user.is_authenticated:
+        report = get_object_or_404(Report, pk=pk)
+        selected_categories = Category.objects.filter(reports__report=report)
+        list_selected_categories_id = [category.id for category in selected_categories]
+        print(f"{list_selected_categories_id=}")
+        if request.method == "POST":
+            form = ReportForm(request.POST, request.FILES, instance=report)
+            list_categories_id = list(
+                map(int, request.POST.getlist("category"))) if "category" in request.POST else None
+            if form.is_valid() and list_categories_id:
+                form.save()
+                messages.success(request, f'خبر "{report.title}" با موفقیت تغییر یافت.')
+
+                for category_id in list_categories_id:
+                    if category_id not in list_selected_categories_id:
+                        ReportCategory.objects.create(report=report, category=Category.objects.get(pk=category_id))
+
+                for category_id in list_selected_categories_id:
+                    if category_id not in list_categories_id:
+                        report_category = ReportCategory.objects.get(report=report,
+                                                                     category=Category.objects.get(pk=category_id))
+                        report_category.delete()
+
+                return redirect("report_detail", report.pk)
+            else:
+                error_labels = [field.label for field in form for _ in field.errors]
+                if "Title" in error_labels:
+                    messages.error(request, "عنوانی برای خبر وجود ندارد...")
+                if "Description" in error_labels:
+                    messages.error(request, "توضیحاتی برای خبر وجود ندارد...")
+        else:
+            form = ReportForm(instance=report)
+        return render(request, "news/report_create_and_update.html",
+                      context={"report": report,
+                               "form": form,
+                               "categories": Category.objects.all(),
+                               "all_selected_categories": selected_categories})
+
+    raise PermissionDenied()
 
 
 class ReportUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Report
     form_class = ReportForm
     template_name = "news/report_create_and_update.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ReportUpdateView, self).get_context_data(**kwargs)
+        context["categories"] = Category.objects.all()
+        context["all_selected_categories"] = Category.objects.filter(reports__report=self.get_object())
+        return context
 
     def form_valid(self, form):
         report = self.object
@@ -299,7 +358,6 @@ def report_search(request):
     authors = []
 
     if request.method == "POST":
-        print(request.POST)
         if "title" in request.POST:
             search_info["title"] = request.POST["search"]
             titles = Report.report_published.filter(
@@ -376,6 +434,7 @@ def report_search(request):
                            "page_obj": reports,
                            "is_title_exist": bool(search_info["title"]),
                            "is_author_exist": bool(search_info["author"]),
+                           "count_pending_reports": Report.objects.filter(status=Report.PENDING).count(),
                            "input_value": search_info["input_value"],
                            "all_categories_checked": [category_name for category_name, value in
                                                       search_info["categories"].items() if value]})
@@ -478,7 +537,8 @@ def report_pending_search(request):
 
 
 def get_reports_based_on_category(request, category_name):
-    reports = Report.report_published.filter(categories__category__name=category_name).order_by("-datetime_modified")
+    category = get_object_or_404(Category, name=category_name)
+    reports = Report.report_published.filter(categories__category=category).order_by("-datetime_modified")
 
     paginator = Paginator(reports, 4)
     page = request.GET.get('page', 1)
@@ -503,3 +563,31 @@ def get_reports_based_on_category(request, category_name):
                            "is_author_exist": bool(request.session["search_info"]["author"]),
                            "input_value": request.session["search_info"]["input_value"]
                            })
+
+
+def get_reports_pending_based_on_category(request, category_name):
+    category = get_object_or_404(Category, name=category_name)
+    reports = Report.objects.filter(categories__category=category, status=Report.PENDING).order_by("-datetime_modified")
+
+    paginator = Paginator(reports, 4)
+    page = request.GET.get('page', 1)
+
+    try:
+        reports = paginator.page(page)
+    except PageNotAnInteger:
+        reports = paginator.page(1)
+    except EmptyPage:
+        reports = paginator.page(paginator.num_pages)
+
+    return render(request, "news/report_pending_list.html",
+                  context={"reports_pending": reports,
+                           "categories": Category.objects.all(),
+                           "is_all_blank": False,
+                           "is_exist": True,
+                           "page_obj": reports,
+                           "all_categories_checked": [category_name for category_name, value in
+                                                      request.session["pending_search_info"]["categories"].items() if
+                                                      value],
+                           "is_title_exist": bool(request.session["pending_search_info"]["title"]),
+                           "is_author_exist": bool(request.session["pending_search_info"]["author"]),
+                           "input_value": request.session["pending_search_info"]["input_value"]})

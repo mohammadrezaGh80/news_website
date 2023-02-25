@@ -119,15 +119,6 @@
             top: -2px;
         }
 
-        .wrapper-news-detail-img {
-            width: 100%;
-            height: 650px;
-        }
-
-        .wrapper-news-detail-img > img {
-            object-fit: cover;
-        }
-
         .invalid-feedback {
             display: none !important;
         }
@@ -195,9 +186,14 @@
                     </ul>
                 {% endif %}
                 <div class="col-12 col-lg-10 offset-lg-1">
-                    <figure class="wrapper-news-detail-img">
-                        <img src="{{ report.cover.url }}"
-                             class="w-100 h-100 d-block" alt="">
+                    <figure style="height: 650px" class="wrapper-news-detail-img" class="w-100">
+                        {% if report.cover %}
+                            <img src="{{ report.cover.url }}"
+                                 alt="" class="w-100 h-100 d-block object-fit-cover">
+                        {% else %}
+                            <img src="{% static 'img/default.jpg' %}"
+                                 alt="" class="w-100 h-100 d-block object-fit-cover">
+                        {% endif %}
                     </figure>
                 </div>
                 <div class="col-12">
@@ -229,12 +225,11 @@
                             <div class="text-white d-flex">
                                 <span>برچسب ها:</span>
                                 {% for report_category in report_categories %}
-                                    <form action="{% url "reports_category" report_category.category.name %}" method="post" class="ms-1">
-                                        {% csrf_token %}
-                                        <button type="submit" name="{{ report_category.category.name }}"
-                                                class="btn btn-outline-danger border-0 p-0">{{ report_category.category.get_name_display }}</button>
-                                        {% if not forloop.last %} ،{% endif %}
-                                    </form>
+                                    <a href="{% url "reports_category" report_category.category.name %}"
+                                       class="ms-1 text-danger">
+                                        {{ report_category.category.get_name_display }}
+                                    </a>
+                                    {% if not forloop.last %} ،{% endif %}
                                 {% endfor %}
                             </div>
                         {% endif %}

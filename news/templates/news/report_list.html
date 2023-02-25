@@ -188,85 +188,89 @@
                            style="background-color: #202125;">
                             <div class="text-white d-flex flex-column align-items-center">
                                 <i class="far fa-folder-open fs-4 mb-2"></i>
-                                <span>پیامهای در انتظار بررسی</span>
+                                <span>پیامهای در انتظار بررسی
+                                    {% if count_pending_reports > 10 %}
+                                        <span class="badge text-bg-primary rounded-pill">+10</span>
+                                    {% else %}
+                                        <span class="badge text-bg-primary rounded-pill">{{ count_pending_reports }}</span>
+                                    {% endif %}
+                                </span>
                             </div>
                         </a>
                     {% endif %}
                     <div class="wrapper-search-box p-3 {% if is_superuser %}mt-3{% endif %}"
                          style="background-color: #202125;">
-                        {% with title=request.session.search_info.title author=request.session.search_info.author %}
-                            <form action="{% url "report_search" %}" method="POST">
-                                {% csrf_token %}
-                                <div class="input-group my-3">
-                                    <input type="text" class="form-control shadow-none rounded-0" placeholder="جستجو..."
-                                           name="search"
-                                            value="{{ input_value }}">
-                                    <button type="submit" class="input-group-text text-light border-0 rounded-0"
-                                            style="background-color:#F54437">
-                                        <i class="fa-solid fa-magnifying-glass"></i>
-                                    </button>
+                        <form action="{% url "report_search" %}" method="POST">
+                            {% csrf_token %}
+                            <div class="input-group my-3">
+                                <input type="text" class="form-control shadow-none rounded-0" placeholder="جستجو..."
+                                       name="search"
+                                       value="{{ input_value }}">
+                                <button type="submit" class="input-group-text text-light border-0 rounded-0"
+                                        style="background-color:#F54437">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                            <div class="accordion my-4" id="accordionExample">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button text-white" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapseOne">
+                                            جستجو بر اساس
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse show">
+                                        <div class="accordion-body">
+                                            <div class="form-check mt-2">
+                                                <input class="form-check-input" name="title" type="checkbox"
+                                                       value="yes"
+                                                       id="title-checkbox"
+                                                       {% if is_title_exist %}checked{% endif %}>
+                                                <label class="form-check-label text-light" for="title-checkbox">
+                                                    عنوان
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" name="author" type="checkbox"
+                                                       value="yes"
+                                                       id="author-checkbox"
+                                                       {% if is_author_exist %}checked{% endif %}>
+                                                <label class="form-check-label text-light" for="author-checkbox">
+                                                    نویسنده
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="accordion my-4" id="accordionExample">
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header" id="headingOne">
-                                            <button class="accordion-button text-white" type="button"
-                                                    data-bs-toggle="collapse"
-                                                    data-bs-target="#collapseOne">
-                                                جستجو بر اساس
-                                            </button>
-                                        </h2>
-                                        <div id="collapseOne" class="accordion-collapse collapse show">
-                                            <div class="accordion-body">
-                                                <div class="form-check mt-2">
-                                                    <input class="form-check-input" name="title" type="checkbox"
-                                                           value="yes"
-                                                           id="title-checkbox"
-                                                           {% if is_title_exist %}checked{% endif %}>
-                                                    <label class="form-check-label text-light" for="title-checkbox">
-                                                        عنوان
-                                                    </label>
-                                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button text-white" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapseTwo">
+                                            نوع خبر
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTwo" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            {% for category in categories %}
                                                 <div class="form-check">
-                                                    <input class="form-check-input" name="author" type="checkbox"
+                                                    <input class="form-check-input" name="{{ category.name }}"
+                                                           type="checkbox"
                                                            value="yes"
-                                                           id="author-checkbox"
-                                                           {% if is_author_exist %}checked{% endif %}>
-                                                    <label class="form-check-label text-light" for="author-checkbox">
-                                                        نویسنده
+                                                           id="{{ category.name }}-checkbox"
+                                                           {% if category.name in all_categories_checked %}checked{% endif %}>
+                                                    <label class="form-check-label text-light"
+                                                           for="{{ category.name }}-checkbox">
+                                                        {{ category.get_name_display }}
                                                     </label>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header" id="headingOne">
-                                            <button class="accordion-button text-white" type="button"
-                                                    data-bs-toggle="collapse"
-                                                    data-bs-target="#collapseTwo">
-                                                نوع خبر
-                                            </button>
-                                        </h2>
-                                        <div id="collapseTwo" class="accordion-collapse collapse">
-                                            <div class="accordion-body">
-                                                {% for category in categories %}
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" name="{{ category.name }}"
-                                                               type="checkbox"
-                                                               value="yes"
-                                                               id="{{ category.name }}-checkbox"
-                                                               {% if category.name in all_categories_checked %}checked{% endif %}>
-                                                        <label class="form-check-label text-light"
-                                                               for="{{ category.name }}-checkbox">
-                                                            {{ category.get_name_display }}
-                                                        </label>
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
+                                            {% endfor %}
                                         </div>
                                     </div>
                                 </div>
-                            </form>
-                        {% endwith %}
+                            </div>
+                        </form>
                     </div>
                     <div class="wrapper-social-media p-3 mt-5 d-none d-lg-block" style="background-color: #202125;">
                         <div class="wrapper-custom-title d-inline-block py-2 px-4 position-relative"
@@ -368,9 +372,14 @@
                                         class="wrapper-news-img-icon bg-light rounded-circle d-none d-lg-inline-block position-absolute opacity-75">
                                     <i class="fa-solid fa-camera text-dark p-2"></i>
                                 </div>
-                                <figure>
-                                    <img src="{{ report.cover.url }}"
-                                         alt="" class="w-100 h-100 d-block">
+                                <figure style="height: 500px;" class="w-100">
+                                    {% if report.cover %}
+                                        <img src="{{ report.cover.url }}"
+                                             alt="" class="w-100 h-100 d-block object-fit-cover">
+                                    {% else %}
+                                        <img src="{% static 'img/default.jpg' %}"
+                                             alt="" class="w-100 h-100 d-block object-fit-cover">
+                                    {% endif %}
                                 </figure>
                                 <div class="wrapper-text-news">
                                     <p class="text-light news-img-caption fs-3">{{ report.title }}</p>

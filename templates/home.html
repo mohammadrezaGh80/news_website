@@ -84,9 +84,15 @@
                         <div class="carousel-inner">
                             {% for news in last_news %}
                                 <a href="{{ news.get_absolute_url }}" class="carousel-item active">
-                                    <img src="{{ news.cover.url }}"
+                                    {% if news.cover %}
+                                        <img src="{{ news.cover.url }}"
                                          style="object-fit: cover;"
                                          class="d-block w-100" height="480" alt="...">
+                                    {% else %}
+                                        <img src="{% static 'img/default.jpg' %}"
+                                         style="object-fit: cover;"
+                                         class="d-block w-100" height="480" alt="...">
+                                    {% endif %}
                                     <div class="custom-carousel-caption">
                                         <h5 style="font-size: 24px;font-family: 'Vazir-Bold', serif;margin-bottom: 32px" class="px-1">{{ news.title|truncatewords:10 }}</h5>
                                         <p class="px-3">{{ news.description|truncatewords:15 }}</p>
