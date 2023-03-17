@@ -391,10 +391,10 @@
                             </div>
                         </div>
                     {% endfor %}
-                    {% if is_exist and not is_all_blank %}
+                    {% if reports_pending %}
                         <div class="d-flex justify-content-center align-items-center mb-3 pagination">
                             {% if page_obj.has_next %}
-                                <a href="?page={{ page_obj.next_page_number }}"
+                                <a href="?page={{ page_obj.next_page_number }}{% if category_name %}&category_name={{ category_name }}{% endif %}"
                                    class="d-flex justify-content-center align-items-center">
                                     <i class="fa-sharp fa-solid fa-caret-right text-light fa-xl"></i>
                                     <span style="margin-left: 2px" class="point-pagination"></span>
@@ -405,7 +405,7 @@
                                 <span class="text-black">{{ page_obj.number }}</span>
                             </span>
                             {% if page_obj.has_previous %}
-                                <a href="?page={{ page_obj.previous_page_number }}"
+                                <a href="?page={{ page_obj.previous_page_number }}{% if category_name %}&category_name={{ category_name }}{% endif %}"
                                    class="d-flex justify-content-center align-items-center">
                                     <span style="margin-right: 2px" class="point-pagination"></span>
                                     <span style="margin-right: 2px" class="point-pagination"></span>

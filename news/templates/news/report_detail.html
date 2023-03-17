@@ -225,7 +225,7 @@
                             <div class="text-white d-flex">
                                 <span>برچسب ها:</span>
                                 {% for report_category in report_categories %}
-                                    <a href="{% url "reports_category" report_category.category.name %}"
+                                    <a href="{% url "report_list"  %}?category_name={{ report_category.category.name }}"
                                        class="ms-1 text-danger">
                                         {{ report_category.category.get_name_display }}
                                     </a>
