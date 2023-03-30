@@ -1,5 +1,7 @@
 {% extends "_base.html" %}
 {% load static %}
+{% load request_tags %}
+{% load report_tags %}
 
 {% block page_title %}لیست خبر ها{% endblock page_title %}
 
@@ -167,6 +169,20 @@
         .accordion-button:focus {
             box-shadow: inset 0 calc(-1 * var(--bs-accordion-border-width)) 0 var(--bs-accordion-border-color) !important;
         }
+
+        .accordion a {
+            color: #F54437;
+        }
+
+        .accordion a:hover {
+            background-color: #fff;
+            font-weight: bold !important;
+        }
+
+        .active {
+            background-color: #fff;
+            font-weight: bold !important;
+        }
     </style>
 {% endblock page_style %}
 
@@ -200,17 +216,20 @@
                     {% endif %}
                     <div class="wrapper-search-box p-3 {% if is_superuser %}mt-3{% endif %}"
                          style="background-color: #202125;">
-                        <form action="{% url "report_search" %}" method="POST">
-                            {% csrf_token %}
-                            <div class="input-group my-3">
+                        <div>
+                            <form method="get" class="input-group my-3">
                                 <input type="text" class="form-control shadow-none rounded-0" placeholder="جستجو..."
-                                       name="search"
-                                       value="{{ input_value }}">
+                                       name="q" value="{{ request.GET.q }}">
+                                {% for item, value in dict_filters.items %}
+                                    {% if value %}
+                                        <input type="hidden" name="{{ item }}" value="{{ value }}">
+                                    {% endif %}
+                                {% endfor %}
                                 <button type="submit" class="input-group-text text-light border-0 rounded-0"
                                         style="background-color:#F54437">
                                     <i class="fa-solid fa-magnifying-glass"></i>
                                 </button>
-                            </div>
+                            </form>
                             <div class="accordion my-4" id="accordionExample">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="headingOne">
@@ -221,24 +240,18 @@
                                         </button>
                                     </h2>
                                     <div id="collapseOne" class="accordion-collapse collapse show">
-                                        <div class="accordion-body">
-                                            <div class="form-check mt-2">
-                                                <input class="form-check-input" name="title" type="checkbox"
-                                                       value="yes"
-                                                       id="title-checkbox"
-                                                       {% if is_title_exist %}checked{% endif %}>
-                                                <label class="form-check-label text-light" for="title-checkbox">
-                                                    عنوان
-                                                </label>
+                                        <div class="accordion-body py-4 px-3 d-flex align-items-center column-gap-2">
+                                            <div>
+                                                <a class="border rounded-pill px-3 py-1 {% if dict_filters.title %}active{% endif %}"
+                                                   href="{% control_query_param key='title' value='true' full_path=request.get_full_path %}">
+                                                    <span>عنوان</span>
+                                                </a>
                                             </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" name="author" type="checkbox"
-                                                       value="yes"
-                                                       id="author-checkbox"
-                                                       {% if is_author_exist %}checked{% endif %}>
-                                                <label class="form-check-label text-light" for="author-checkbox">
-                                                    نویسنده
-                                                </label>
+                                            <div>
+                                                <a class="border rounded-pill px-3 py-1 {% if dict_filters.author %}active{% endif %}"
+                                                   href="{% control_query_param key='author' value='true' full_path=request.get_full_path %}">
+                                                    <span>نویسنده</span>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -252,25 +265,22 @@
                                         </button>
                                     </h2>
                                     <div id="collapseTwo" class="accordion-collapse collapse">
-                                        <div class="accordion-body">
+                                        <div class="accordion-body py-4 px-3 d-flex align-items-center row-gap-4 column-gap-2 flex-wrap">
                                             {% for category in categories %}
-                                                <div class="form-check">
-                                                    <input class="form-check-input" name="{{ category.name }}"
-                                                           type="checkbox"
-                                                           value="yes"
-                                                           id="{{ category.name }}-checkbox"
-                                                           {% if category.name in all_categories_checked %}checked{% endif %}>
-                                                    <label class="form-check-label text-light"
-                                                           for="{{ category.name }}-checkbox">
-                                                        {{ category.get_name_display }}
-                                                    </label>
+                                                <div class="mt-1">
+                                                    <div>
+                                                        <a class="border rounded-pill px-3 py-1 {% if dict_filters|get_item:category.name %}active{% endif %}"
+                                                           href="{% control_query_param key=category.name value='true' full_path=request.get_full_path %}">
+                                                            <span>{{ category.get_name_display }}</span>
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             {% endfor %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                     <div class="wrapper-social-media p-3 mt-5 d-none d-lg-block" style="background-color: #202125;">
                         <div class="wrapper-custom-title d-inline-block py-2 px-4 position-relative"
@@ -346,24 +356,13 @@
                     </div>
                 </div>
                 <div class="col-lg-7 offset-lg-1 offset-0 col-12 d-flex flex-column mt-5 mt-lg-0">
-                    {% if request.resolver_match.view_name == "report_search" %}
-                        {% if is_all_blank %}
-                            <div class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row">
-                                <div class="d-flex flex-column flex-lg-row align-items-center py-2 py-lg-0">
-                                    <i class="fa-solid fa-circle-exclamation mb-3 mb-lg-0 me-lg-2 fa-xl"></i>
-                                    <p class="text-white text-center text-lg-start">متاسفانه هیچ دسته بندی برای جست و جو
-                                        انتخاب نکردید!</p>
-                                </div>
+                    {% if not is_exist %}
+                        <div class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row">
+                            <div class="d-flex flex-column flex-lg-row align-items-center py-2 py-lg-0">
+                                <i class="fa-solid fa-face-frown mb-3 mb-lg-0 me-lg-2 fa-xl"></i>
+                                <p class="text-white text-center text-lg-start">متاسفانه خبری پیدا نشد...!</p>
                             </div>
-                        {% endif %}
-                        {% if not is_exist %}
-                            <div class="warning-form card py-3 px-4 justify-content-lg-between flex-lg-row">
-                                <div class="d-flex flex-column flex-lg-row align-items-center py-2 py-lg-0">
-                                    <i class="fa-solid fa-face-frown mb-3 mb-lg-0 me-lg-2 fa-xl"></i>
-                                    <p class="text-white text-center text-lg-start">متاسفانه خبری پیدا نشد...!</p>
-                                </div>
-                            </div>
-                        {% endif %}
+                        </div>
                     {% endif %}
                     {% for report in reports %}
                         <div class="mb-5">
@@ -404,7 +403,7 @@
                     {% if reports %}
                         <div class="d-flex justify-content-center align-items-center mb-3 pagination">
                             {% if page_obj.has_next %}
-                                <a href="?page={{ page_obj.next_page_number }}{% if category_name %}&category_name={{ category_name }}{% endif %}"
+                                <a href="{% control_query_param key='page' value=page_obj.next_page_number full_path=request.get_full_path %}"
                                    class="d-flex justify-content-center align-items-center">
                                     <i class="fa-sharp fa-solid fa-caret-right text-light fa-xl"></i>
                                     <span style="margin-left: 2px" class="point-pagination"></span>
@@ -415,7 +414,7 @@
                             <span class="text-black">{{ page_obj.number }}</span>
                         </span>
                             {% if page_obj.has_previous %}
-                                <a href="?page={{ page_obj.previous_page_number }}{% if category_name %}&category_name={{ category_name }}{% endif %}"
+                                <a href="{% control_query_param key='page' value=page_obj.previous_page_number full_path=request.get_full_path %}"
                                    class="d-flex justify-content-center align-items-center">
                                     <span style="margin-right: 2px" class="point-pagination"></span>
                                     <span style="margin-right: 2px" class="point-pagination"></span>

@@ -1,6 +1,7 @@
 {% extends "_base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load request_tags %}
 
 {% block page_title %}{{ report.title }}{% endblock page_title %}
 
@@ -217,7 +218,7 @@
                             <div class="text-white d-flex">
                                 <span>برچسب ها:</span>
                                 {% for report_category in report_categories %}
-                                    <a href="{% url "report_pending_list" %}?category_name={{ report_category.category.name }}"
+                                    <a href="{% control_query_param key=report_category.category.name value='true' full_path='/news/pending/' %}"
                                        class="ms-1 text-danger">
                                         {{ report_category.category.get_name_display }}
                                     </a>

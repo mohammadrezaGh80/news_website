@@ -7,31 +7,62 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.decorators.http import require_POST
 
 from datetime import datetime
-
 
 from .models import Report, Comment, CommentRelation, UserLikeComment, UserDislikeComment, Category, ReportCategory
 from .forms import ReportForm, CommentForm
 
 
 def report_list_view(request):
-    if request.session.get("search_info") is None:
-        request.session["search_info"] = {"input_value": "", "title": "", "author": "",
-                                          "categories": {category.name: True for category in
-                                                         Category.objects.all()}}
-    reports = Report.report_published.order_by("-datetime_modified")
+    is_exist = False
 
-    category_name = request.GET.get('category_name', '')
+    q = request.GET.get('q', '')
+    title = request.GET.get('title')
+    author = request.GET.get('author')
+    sport = request.GET.get('sport')
+    football = request.GET.get('football')
+    political = request.GET.get('political')
+    internal = request.GET.get('internal')
+    foreign = request.GET.get('foreign')
+    exclusive = request.GET.get('exclusive')
 
-    if category_name:
-        reports = reports.filter(categories__category__name=category_name)
+    dict_filters = {"title": title, "author": author, "sport": sport,
+                    "football": football, "political": political,
+                    "internal": internal, "foreign": foreign, "exclusive": exclusive}
+
+    if not title and not author:
+        dict_filters['title'], dict_filters['author'] = 'true', 'true'
+
+    if q:
+        queryset_reports = Report.report_published.filter(
+            Q(title__contains=q if dict_filters['title'] else []) |
+            Q(author__username__contains=q if dict_filters['author'] else []))
+    else:
+        queryset_reports = Report.report_published
+
+    dict_categories = {"sport": sport, "football": football, "political": political,
+                       "internal": internal, "foreign": foreign, "exclusive": exclusive}
+
+    for item_filter in dict_filters.values():
+        if item_filter not in [None, 'true']:
+            raise Http404()
+
+    all_categories_select_name = [item for item in dict_categories if dict_categories[item]]
+
+    reports = queryset_reports.filter(
+        categories__category__name__in=all_categories_select_name if all_categories_select_name
+        else [*dict_categories.keys()]
+    ).distinct().order_by("-datetime_modified")
+
+    if reports.exists():
+        is_exist = True
 
     paginator = Paginator(reports, 4)
-    page = request.GET.get('page', 1)
+    page = request.GET.get('page')
 
     try:
         reports = paginator.page(page)
@@ -45,15 +76,9 @@ def report_list_view(request):
         "page_obj": reports,
         "is_superuser": bool(request.user in get_user_model().objects.filter(is_superuser=True)),
         "categories": Category.objects.all(),
-        "is_all_blank": False,
-        "is_exist": True,
+        "is_exist": is_exist,
         "count_pending_reports": Report.objects.filter(status=Report.PENDING).count(),
-        "all_categories_checked": [category_name for category_name, value in
-                                   request.session["search_info"]["categories"].items() if value],
-        "is_title_exist": bool(request.session["search_info"]["title"]),
-        "is_author_exist": bool(request.session["search_info"]["author"]),
-        "input_value": request.session["search_info"]["input_value"],
-        "category_name": category_name
+        "dict_filters": dict_filters
     })
 
 
@@ -304,21 +329,51 @@ def comment_dislike_view(request, pk, comment_id):
 
 
 def report_pending_list_view(request):
-    if request.session.get("pending_search_info") is None:
-        request.session["pending_search_info"] = {
-            "title": "", "author": "", "input_value": "",
-            "categories": {category.name: True for category in Category.objects.all()}
-        }
+    is_exist = False
 
-    reports = Report.objects.filter(status=Report.PENDING).order_by("-datetime_modified")
+    q = request.GET.get('q', '')
+    title = request.GET.get('title')
+    author = request.GET.get('author')
+    sport = request.GET.get('sport')
+    football = request.GET.get('football')
+    political = request.GET.get('political')
+    internal = request.GET.get('internal')
+    foreign = request.GET.get('foreign')
+    exclusive = request.GET.get('exclusive')
 
-    category_name = request.GET.get('category_name', '')
+    dict_filters = {"title": title, "author": author, "sport": sport,
+                    "football": football, "political": political,
+                    "internal": internal, "foreign": foreign, "exclusive": exclusive}
 
-    if category_name:
-        reports = reports.filter(categories__category__name=category_name)
+    if not title and not author:
+        dict_filters['title'], dict_filters['author'] = 'true', 'true'
+
+    if q:
+        queryset_reports = Report.objects.filter(status=Report.PENDING).filter(
+            Q(title__contains=q if dict_filters['title'] else []) |
+            Q(author__username__contains=q if dict_filters['author'] else []))
+    else:
+        queryset_reports = Report.objects.filter(status=Report.PENDING)
+
+    dict_categories = {"sport": sport, "football": football, "political": political,
+                       "internal": internal, "foreign": foreign, "exclusive": exclusive}
+
+    for item_filter in dict_filters.values():
+        if item_filter not in [None, 'true']:
+            raise Http404()
+
+    all_categories_select_name = [item for item in dict_categories if dict_categories[item]]
+
+    reports = queryset_reports.filter(
+        categories__category__name__in=all_categories_select_name if all_categories_select_name
+        else [*dict_categories.keys()]
+    ).distinct().order_by("-datetime_modified")
+
+    if reports.exists():
+        is_exist = True
 
     paginator = Paginator(reports, 4)
-    page = request.GET.get('page', 1)
+    page = request.GET.get('page')
 
     try:
         reports = paginator.page(page)
@@ -330,17 +385,9 @@ def report_pending_list_view(request):
     return render(request, "news/report_pending_list.html", context={
         "reports_pending": reports,
         "page_obj": reports,
-        "is_superuser": bool(request.user in get_user_model().objects.filter(is_superuser=True)),
         "categories": Category.objects.all(),
-        "is_all_blank": False,
-        "is_exist": True,
-        "count_pending_reports": Report.objects.filter(status=Report.PENDING).count(),
-        "all_categories_checked": [category_name for category_name, value in
-                                   request.session["pending_search_info"]["categories"].items() if value],
-        "is_title_exist": bool(request.session["pending_search_info"]["title"]),
-        "is_author_exist": bool(request.session["pending_search_info"]["author"]),
-        "input_value": request.session["pending_search_info"]["input_value"],
-        "category_name": category_name
+        "is_exist": is_exist,
+        "dict_filters": dict_filters
     })
 
 
@@ -372,190 +419,3 @@ class ReportPendingDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.D
             report.save()
             messages.error(request, f'خبر "{report.title}" رد شد.')
             return redirect("report_pending_list")
-
-
-def report_search(request):
-    search_info = request.session.get("search_info")
-
-    is_all_blank = False
-    is_exist = True
-    titles = []
-    authors = []
-
-    if request.method == "POST":
-        if "title" in request.POST:
-            search_info["title"] = request.POST["search"]
-            titles = Report.report_published.filter(
-                title__contains=search_info["title"]
-            )
-        else:
-            search_info["title"] = ""
-
-        if "author" in request.POST:
-            search_info["author"] = request.POST["search"]
-            authors = get_user_model().objects.filter(
-                username__contains=search_info["author"]
-            )
-        else:
-            search_info["author"] = ""
-
-        search_info["input_value"] = request.POST["search"]
-        request.session.modified = True
-
-        for category in Category.objects.all():
-            if category.name in request.POST:
-                search_info["categories"][category.name] = True
-            else:
-                search_info["categories"][category.name] = False
-        request.session.modified = True
-
-    if search_info["title"]:
-        titles = Report.report_published.filter(title__contains=search_info["title"])
-    if search_info["author"]:
-        authors = get_user_model().objects.filter(username__contains=search_info["author"])
-
-    news = Report.report_published.filter(
-        categories__category__name__in=[category_name for category_name in search_info["categories"] if
-                                        search_info["categories"][category_name] is True]
-    ).distinct().order_by("-datetime_modified")
-
-    if titles == '' and authors == '' and not news:
-        is_all_blank = True
-    elif not (titles or authors or news) or not news:
-        is_exist = False
-
-    reports = Report.report_published.filter(
-        Q(title__in=[*titles]) |
-        Q(author__in=[*authors])
-    ).order_by("-datetime_modified")
-
-    if reports:
-        if exist_reports := list(set(news) & {*reports}):
-            reports = list(sorted(exist_reports, key=lambda report: report.datetime_modified, reverse=True))
-        else:
-            reports = list()
-            is_exist = False
-    else:
-        if search_info["title"] or search_info["author"]:
-            is_exist = False
-        else:
-            reports = news
-
-    paginator = Paginator(reports, 4)
-    page = request.GET.get('page', 1)
-
-    try:
-        reports = paginator.page(page)
-    except PageNotAnInteger:
-        reports = paginator.page(1)
-    except EmptyPage:
-        reports = paginator.page(paginator.num_pages)
-
-    return render(request,
-                  "news/report_list.html",
-                  context={"reports": reports, "is_all_blank": is_all_blank,
-                           "is_exist": is_exist, "categories": Category.objects.all(),
-                           "is_superuser": bool(request.user in get_user_model().objects.filter(is_superuser=True)),
-                           "page_obj": reports,
-                           "is_title_exist": bool(search_info["title"]),
-                           "is_author_exist": bool(search_info["author"]),
-                           "count_pending_reports": Report.objects.filter(status=Report.PENDING).count(),
-                           "input_value": search_info["input_value"],
-                           "all_categories_checked": [category_name for category_name, value in
-                                                      search_info["categories"].items() if value]})
-
-
-@login_required
-def report_pending_search(request):
-    if request.user in get_user_model().objects.filter(is_superuser=True):
-
-        pending_search_info = request.session.get("pending_search_info")
-
-        is_all_blank = False
-        is_exist = True
-        titles = []
-        authors = []
-
-        if request.method == "POST":
-            if "title" in request.POST:
-                pending_search_info["title"] = request.POST["search"]
-                titles = Report.objects.filter(
-                    title__contains=pending_search_info["title"],
-                    status=Report.PENDING,
-                )
-            else:
-                pending_search_info["title"] = ""
-
-            if "author" in request.POST:
-                pending_search_info["author"] = request.POST["search"]
-                authors = get_user_model().objects.filter(
-                    username__contains=pending_search_info["author"]
-                )
-            else:
-                pending_search_info["author"] = ""
-
-            pending_search_info["input_value"] = request.POST["search"]
-            request.session.modified = True
-
-            for category in Category.objects.all():
-                if category.name in request.POST:
-                    pending_search_info["categories"][category.name] = True
-                else:
-                    pending_search_info["categories"][category.name] = False
-            request.session.modified = True
-
-        if pending_search_info["title"]:
-            titles = Report.objects.filter(title__contains=pending_search_info["title"], status=Report.PENDING)
-        if pending_search_info["author"]:
-            authors = get_user_model().objects.filter(username__contains=pending_search_info["author"])
-
-        news = Report.objects.filter(
-            categories__category__name__in=[category_name for category_name in pending_search_info["categories"] if
-                                            pending_search_info["categories"][category_name] is True]
-        ).filter(status=Report.PENDING).distinct().order_by("-datetime_modified")
-
-        if titles == '' and authors == '' and not news:
-            is_all_blank = True
-        elif not (titles or authors or news) or not news:
-            is_exist = False
-
-        reports = Report.objects.filter(
-            Q(title__in=[*titles]) |
-            Q(author__in=[*authors])
-        ).filter(status=Report.PENDING).order_by("-datetime_modified")
-
-        if reports:
-            if exist_reports := list(set(news) & {*reports}):
-                reports = list(sorted(exist_reports, key=lambda report: report.datetime_modified, reverse=True))
-            else:
-                reports = list()
-                is_exist = False
-        else:
-            if pending_search_info["title"] or pending_search_info["author"]:
-                is_exist = False
-            else:
-                reports = news
-
-        paginator = Paginator(reports, 4)
-        page = request.GET.get('page', 1)
-
-        try:
-            reports = paginator.page(page)
-        except PageNotAnInteger:
-            reports = paginator.page(1)
-        except EmptyPage:
-            reports = paginator.page(paginator.num_pages)
-
-        return render(request, "news/report_pending_list.html",
-                      context={"reports_pending": reports,
-                               "is_all_blank": is_all_blank,
-                               "is_exist": is_exist,
-                               "categories": Category.objects.all(),
-                               "is_superuser": bool(request.user in get_user_model().objects.filter(is_superuser=True)),
-                               "page_obj": reports,
-                               "is_title_exist": bool(pending_search_info["title"]),
-                               "is_author_exist": bool(pending_search_info["author"]),
-                               "input_value": pending_search_info["input_value"],
-                               "all_categories_checked": [category_name for category_name, value in
-                                                          pending_search_info["categories"].items() if value]})
-    raise PermissionDenied()
